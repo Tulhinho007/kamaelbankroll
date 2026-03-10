@@ -1,0 +1,2104 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KamaelBankroll — Gestão de Banca</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root {
+  --teal:#0CB89A; --teal-light:#E6F9F6; --teal-dark:#099480;
+  --bg:#F4F6F8; --white:#FFFFFF;
+  --sidebar:#FFFFFF; --sidebar-w:240px;
+  --text:#1C2434; --text2:#637381; --text3:#ADB5C0;
+  --border:#E8ECF0; --border2:#D1D9E0;
+  --green:#22C55E; --green-bg:#F0FDF4; --green-text:#16A34A;
+  --red:#EF4444; --red-bg:#FEF2F2; --red-text:#DC2626;
+  --gold:#F59E0B; --gold-bg:#FFFBEB; --gold-text:#D97706;
+  --blue:#3B82F6; --blue-bg:#EFF6FF;
+  --shadow:0 1px 4px rgba(0,0,0,0.08); --shadow2:0 4px 16px rgba(0,0,0,0.1);
+  --radius:10px; --radius2:14px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.5}
+a{text-decoration:none}
+
+/* ── LOGIN ── */
+#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#F4F6F8 0%,#E8F8F5 100%)}
+.login-box{background:var(--white);border-radius:20px;padding:44px 40px;width:420px;box-shadow:0 8px 40px rgba(12,184,154,0.12)}
+.login-logo{text-align:center;margin-bottom:28px}
+.login-logo-name{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:var(--text)}
+.login-logo-name span{color:var(--teal)}
+.login-logo-sub{font-size:13px;color:var(--text2);margin-top:4px}
+.login-title{font-size:22px;font-weight:700;margin-bottom:4px}
+.login-sub{font-size:13px;color:var(--text2);margin-bottom:24px}
+.lf{display:flex;flex-direction:column;gap:14px}
+.lf label{font-size:11px;font-weight:600;letter-spacing:.5px;color:var(--text2);text-transform:uppercase;margin-bottom:4px;display:block}
+.lf input{width:100%;padding:12px 14px;border:1.5px solid var(--border2);border-radius:var(--radius);font-size:14px;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);outline:none;transition:border .2s}
+.lf input:focus{border-color:var(--teal);background:var(--white)}
+.btn-login{width:100%;padding:13px;background:var(--teal);color:var(--white);border:none;border-radius:var(--radius);font-size:15px;font-weight:600;cursor:pointer;margin-top:6px;font-family:'DM Sans',sans-serif;transition:background .2s}
+.btn-login:hover{background:var(--teal-dark)}
+.login-hint{margin-top:18px;font-size:12px;color:var(--text2);text-align:center;padding:10px 14px;background:var(--bg);border-radius:8px}
+.login-hint strong{color:var(--teal)}
+.login-err{color:var(--red);font-size:13px;text-align:center;margin-top:8px;display:none}
+.login-tabs{display:flex;background:var(--bg);border-radius:10px;padding:4px;margin-bottom:22px}
+.login-tab{flex:1;padding:9px;text-align:center;border-radius:7px;cursor:pointer;font-size:13.5px;font-weight:600;color:var(--text2);border:none;background:none;font-family:'DM Sans',sans-serif;transition:all .15s}
+.login-tab.active{background:var(--white);color:var(--teal);box-shadow:0 1px 4px rgba(0,0,0,0.08)}
+.pass-reqs{background:var(--bg);border-radius:9px;padding:12px 14px;margin-bottom:12px}
+.pass-reqs-title{font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--text2);margin-bottom:8px}
+.pass-req{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2);margin-bottom:4px;transition:color .2s}
+.pass-req.met{color:var(--green-text)}
+.pass-req::before{content:"○";font-size:10px;flex-shrink:0;transition:all .15s}
+.pass-req.met::before{content:"●";color:var(--teal)}
+
+/* ── APP SHELL ── */
+#app{display:none;height:100vh;overflow:hidden;flex-direction:row}
+/* SIDEBAR */
+.sidebar{width:var(--sidebar-w);flex-shrink:0;background:var(--sidebar);border-right:1px solid var(--border);display:flex;flex-direction:column;height:100vh;overflow-y:auto}
+.sidebar-logo{padding:20px 18px 14px;border-bottom:1px solid var(--border)}
+.sidebar-logo-name{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--text)}
+.sidebar-logo-name span{color:var(--teal)}
+.sidebar-logo-sub{font-size:11px;color:var(--text2);margin-top:1px}
+.sidebar-nav{flex:1;padding:14px 10px}
+.nav-section-label{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--text3);padding:8px 8px 4px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;color:var(--text2);font-weight:500;transition:all .15s;margin-bottom:2px;font-size:13.5px}
+.nav-item:hover{background:var(--teal-light);color:var(--teal)}
+.nav-item.active{background:var(--teal);color:var(--white)}
+.nav-item svg{width:16px;height:16px;flex-shrink:0}
+.sidebar-user{padding:14px 14px 16px;border-top:1px solid var(--border);margin-top:auto}
+.user-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.user-avatar{width:34px;height:34px;border-radius:50%;background:var(--teal);color:var(--white);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0}
+.user-email{font-size:12px;color:var(--text2);font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.btn-sair{display:flex;align-items:center;gap:7px;color:var(--text2);font-size:13px;cursor:pointer;padding:7px 8px;border-radius:7px;transition:all .15s;font-weight:500}
+.btn-sair:hover{background:var(--red-bg);color:var(--red)}
+
+/* MAIN */
+.main{flex:1;overflow-y:auto;display:flex;flex-direction:column}
+.page{display:none;padding:32px 36px;min-height:100%}
+.page.active{display:block}
+.page-header{margin-bottom:28px}
+.page-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--text)}
+.page-sub{font-size:13px;color:var(--text2);margin-top:3px}
+
+/* BANNER */
+.viewing-banner{background:var(--gold-bg);border:1px solid #FDE68A;padding:10px 18px;display:flex;align-items:center;gap:12px;font-size:13px;color:var(--gold-text)}
+.viewing-banner button{margin-left:auto;padding:5px 12px;background:var(--gold);color:var(--white);border:none;border-radius:6px;cursor:pointer;font-size:12px;font-family:'DM Sans',sans-serif}
+
+/* CARDS */
+.card{background:var(--white);border-radius:var(--radius2);border:1px solid var(--border);padding:20px}
+.card-t{font-size:13px;font-weight:700;color:var(--text);margin-bottom:14px;display:flex;align-items:center;gap:7px}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.stat-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius2);padding:18px 20px}
+.stat-label{font-size:12px;color:var(--text2);margin-bottom:6px}
+.stat-val{font-size:20px;font-weight:700;color:var(--text)}
+.stat-val.teal{color:var(--teal)}
+.stat-val.green{color:var(--green-text)}
+.stat-val.red{color:var(--red-text)}
+.stat-val.gold{color:var(--gold-text)}
+.stat-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;font-size:18px}
+
+/* TABLE */
+.table-wrap{background:var(--white);border:1px solid var(--border);border-radius:var(--radius2);overflow:hidden}
+.table-head{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.table-title{font-size:14px;font-weight:700;color:var(--text)}
+table{width:100%;border-collapse:collapse}
+thead th{padding:11px 16px;text-align:left;font-size:12px;font-weight:600;color:var(--text2);background:#FAFBFC;border-bottom:1px solid var(--border)}
+tbody td{padding:12px 16px;border-bottom:1px solid var(--border);font-size:13.5px;color:var(--text)}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover{background:#FAFBFC}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600}
+.badge-green{background:var(--green-bg);color:var(--green-text)}
+.badge-red{background:var(--red-bg);color:var(--red-text)}
+.badge-gold{background:var(--gold-bg);color:var(--gold-text)}
+.badge-blue{background:var(--blue-bg);color:var(--blue)}
+.badge-teal{background:var(--teal-light);color:var(--teal)}
+.badge-gray{background:#F3F4F6;color:#6B7280}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:8px;font-size:13.5px;font-weight:600;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:all .15s}
+.btn-primary{background:var(--teal);color:var(--white)}
+.btn-primary:hover{background:var(--teal-dark)}
+.btn-outline{background:var(--white);color:var(--text2);border:1.5px solid var(--border2)}
+.btn-outline:hover{border-color:var(--teal);color:var(--teal)}
+.btn-danger{background:var(--red-bg);color:var(--red-text);border:1px solid #FCA5A5}
+.btn-danger:hover{background:#FEE2E2}
+.btn-sm{padding:6px 11px;font-size:12px}
+.btn-icon{width:32px;height:32px;padding:0;justify-content:center;background:var(--bg);border:1px solid var(--border);color:var(--text2);border-radius:7px}
+.btn-icon:hover{background:var(--teal-light);color:var(--teal);border-color:var(--teal)}
+
+/* FORMS */
+.fg{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.fl{font-size:11px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;color:var(--text2)}
+.fi,.fs{width:100%;padding:10px 12px;border:1.5px solid var(--border2);border-radius:8px;font-size:13.5px;font-family:'DM Sans',sans-serif;color:var(--text);background:var(--white);outline:none;transition:border .15s}
+.fi:focus,.fs:focus{border-color:var(--teal)}
+.fi::placeholder{color:var(--text3)}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fgrid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+
+/* MODAL */
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:1000;align-items:center;justify-content:center}
+.mo.open{display:flex}
+.modal{background:var(--white);border-radius:var(--radius2);padding:24px;width:480px;max-width:95vw;max-height:92vh;overflow-y:auto;box-shadow:var(--shadow2)}
+.modal-wide{width:580px}
+.mh{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.mt2{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;color:var(--text)}
+.mc{background:none;border:none;cursor:pointer;color:var(--text2);font-size:18px;width:30px;height:30px;border-radius:6px;display:flex;align-items:center;justify-content:center}
+.mc:hover{background:var(--bg)}
+
+/* EMPTY STATE */
+.empty-state{padding:48px;text-align:center;color:var(--text2)}
+.empty-icon{font-size:40px;margin-bottom:12px}
+.empty-text{font-size:14px}
+
+/* PROGRESS BAR */
+.progress-wrap{background:var(--border);border-radius:999px;height:6px;overflow:hidden;margin:8px 0}
+.progress-bar{height:100%;background:var(--teal);border-radius:999px;transition:width .3s}
+
+/* TABS */
+.tab-bar{display:flex;gap:4px;background:var(--bg);border-radius:10px;padding:4px;margin-bottom:20px}
+.tab{padding:8px 16px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:600;color:var(--text2);border:none;background:none;font-family:'DM Sans',sans-serif;transition:all .15s}
+.tab.active{background:var(--white);color:var(--teal);box-shadow:var(--shadow)}
+
+/* SELECT CUSTOM */
+.casa-select{position:relative;display:inline-block}
+.casa-select select{appearance:none;padding:8px 34px 8px 12px;border:1.5px solid var(--border2);border-radius:8px;font-size:13.5px;font-family:'DM Sans',sans-serif;background:var(--white);color:var(--text);cursor:pointer;outline:none;min-width:160px}
+.casa-select::after{content:"▾";position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--text2);pointer-events:none}
+
+/* ICON PICKER */
+.ico-grid{display:flex;flex-wrap:wrap;gap:8px}
+.ico-btn{width:42px;height:42px;border-radius:10px;border:2px solid var(--border2);background:var(--bg);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.ico-btn:hover{border-color:var(--teal);transform:scale(1.08)}
+.ico-btn.sel{border-color:var(--teal);background:var(--teal-light)}
+
+/* CASA DOT */
+.casa-dot{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:6px}
+
+
+/* HOME INFO TABS & BANNERS */
+.home-info-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;max-width:820px;margin-left:auto;margin-right:auto}
+.home-info-tab{display:flex;align-items:center;gap:7px;padding:8px 14px;border-radius:20px;border:1.5px solid var(--border2);background:var(--white);cursor:pointer;font-size:13px;font-weight:600;color:var(--text2);transition:all .15s;font-family:'DM Sans',sans-serif}
+.home-info-tab:hover{border-color:var(--teal);color:var(--teal)}
+.home-info-tab.active{background:var(--teal);color:var(--white);border-color:var(--teal)}
+.home-info-panel{display:none;max-width:820px;margin:0 auto 20px;animation:fadeIn .2s ease}
+.home-info-panel.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+/* BANNER BASE */
+.banner{position:relative;border-radius:16px;overflow:hidden;padding:28px 32px;min-height:120px;display:flex;align-items:flex-start;gap:20px}
+.banner-bg-icon{position:absolute;right:-10px;bottom:-18px;font-size:110px;opacity:.08;pointer-events:none;line-height:1;user-select:none}
+.banner-content{position:relative;z-index:1;flex:1}
+.banner-label{font-size:11.5px;font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;opacity:.75}
+.banner-title{font-family:'Syne',sans-serif;font-size:21px;font-weight:800;margin-bottom:10px;line-height:1.2}
+.banner-body{font-size:15px;line-height:1.7;opacity:.9}
+.banner-body p{margin-bottom:8px}
+.banner-body p:last-child{margin-bottom:0}
+.banner-body strong{opacity:1;font-weight:700}
+.banner-icon-left{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;position:relative;z-index:1}
+/* VARIANTS */
+.banner-teal{background:linear-gradient(135deg,#0CB89A 0%,#07A085 100%);color:var(--white)}
+.banner-teal .banner-icon-left{background:rgba(255,255,255,.18)}
+.banner-dark{background:linear-gradient(135deg,#1C2434 0%,#2D3748 100%);color:var(--white)}
+.banner-dark .banner-icon-left{background:rgba(255,255,255,.12)}
+.banner-gold{background:linear-gradient(135deg,#D97706 0%,#B45309 100%);color:var(--white)}
+.banner-gold .banner-icon-left{background:rgba(255,255,255,.18)}
+.banner-blue{background:linear-gradient(135deg,#2563EB 0%,#1D4ED8 100%);color:var(--white)}
+.banner-blue .banner-icon-left{background:rgba(255,255,255,.18)}
+/* SUGESTOES GRID */
+.sug-banner-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.sug-banner{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:18px 20px;position:relative;overflow:hidden;transition:transform .15s,box-shadow .15s}
+.sug-banner:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.08)}
+.sug-banner-bg{position:absolute;right:-8px;bottom:-12px;font-size:64px;opacity:.07;pointer-events:none;line-height:1}
+.sug-banner-icon{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:10px}
+.sug-banner-title{font-size:14px;font-weight:700;margin-bottom:4px}
+.sug-banner-desc{font-size:12.5px;color:var(--text2);line-height:1.5}
+
+/* HOME page */
+.home-welcome{text-align:center;padding:32px 20px 24px}
+.home-welcome h1{font-family:'Syne',sans-serif;font-size:28px;font-weight:800}
+.home-welcome p{color:var(--text2);margin-top:6px}
+.home-casa-card{max-width:540px;margin:0 auto 28px;background:var(--white);border:1px solid var(--border);border-radius:var(--radius2);padding:20px 24px}
+.home-casa-label{font-size:12px;color:var(--text2);font-weight:600;margin-bottom:8px}
+.home-casa-icon{width:50px;height:50px;border-radius:12px;background:var(--teal-light);display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:12px}
+.home-info{font-size:12px;color:var(--green-text);margin-top:8px;display:flex;align-items:center;gap:6px}
+.home-link{color:var(--teal);font-size:12px;display:flex;align-items:center;gap:4px;cursor:pointer}
+.sugestoes-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:700px;margin:0 auto}
+.sug-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius2);padding:16px 18px;display:flex;align-items:flex-start;gap:12px}
+.sug-card.teal-border{border-left:3px solid var(--teal)}
+.sug-card.gold-border{border-left:3px solid var(--gold)}
+.sug-ico{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.sug-title{font-size:13.5px;font-weight:700}
+.sug-desc{font-size:12px;color:var(--text2);margin-top:3px}
+
+/* ADMIN */
+.admin-grid{display:grid;grid-template-columns:340px 1fr;gap:20px}
+.admin-user-list{background:var(--white);border:1px solid var(--border);border-radius:var(--radius2);overflow:hidden}
+.admin-list-head{padding:16px 18px;border-bottom:1px solid var(--border);font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px}
+.admin-user-item{padding:13px 18px;border-bottom:1px solid var(--border);cursor:pointer;display:flex;align-items:center;gap:12px;transition:background .12s}
+.admin-user-item:last-child{border-bottom:none}
+.admin-user-item:hover,.admin-user-item.selected{background:var(--teal-light);border-left:3px solid var(--teal)}
+.admin-user-item:not(.selected){border-left:3px solid transparent}
+.admin-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0}
+.admin-detail{background:var(--white);border:1px solid var(--border);border-radius:var(--radius2);padding:24px}
+.detail-field{padding:14px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:13.5px}
+.detail-field:last-of-type{border-bottom:none}
+.detail-label{color:var(--text2)}
+.detail-val{font-weight:600}
+.detail-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
+
+/* ALAVANCAGEM */
+.alav-table thead th:nth-child(3){color:var(--teal)}
+.alav-table tbody td:nth-child(3){color:var(--teal);font-weight:600}
+.alav-table tbody td:nth-child(4){color:var(--teal);font-weight:700}
+
+/* DICAS */
+.dica-perfil-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:28px}
+.dica-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius2);padding:20px}
+.dica-card-icon{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:12px}
+.dica-list{list-style:none;margin-top:10px}
+.dica-list li{font-size:13px;color:var(--text2);padding:4px 0 4px 14px;position:relative}
+.dica-list li::before{content:"•";position:absolute;left:0;color:var(--teal)}
+.dica-geral-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:28px}
+.dica-geral-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius2);padding:16px 18px;display:flex;align-items:flex-start;gap:12px}
+.regras-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.regra-item{padding:14px 16px}
+.regra-num{font-size:15px;font-weight:800;color:var(--teal);margin-bottom:4px}
+.regra-title{font-size:13.5px;font-weight:600;margin-bottom:2px}
+.regra-desc{font-size:12px;color:var(--text2)}
+
+/* GESTÃO BANCA */
+.gestao-top{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.banca-info-cards{display:flex;gap:12px;margin-bottom:16px}
+.banca-info-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius2);padding:14px 20px;min-width:160px}
+.banca-info-label{font-size:12px;color:var(--text2);margin-bottom:4px}
+.banca-info-val{font-size:18px;font-weight:700;color:var(--text)}
+.banca-info-val.green{color:var(--teal)}
+.editar-banca-btn{background:none;border:none;color:var(--text2);cursor:pointer;padding:2px;font-size:14px}
+
+/* TRANSAÇÕES */
+.trans-stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.trans-stat{background:var(--white);border:1px solid var(--border);border-radius:var(--radius2);padding:16px 18px;display:flex;align-items:center;gap:14px}
+.trans-stat-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.trans-filters{display:flex;gap:10px;margin-bottom:16px;align-items:center;flex-wrap:wrap}
+.trans-filters select{padding:8px 12px;border:1.5px solid var(--border2);border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--text);background:var(--white);outline:none;cursor:pointer}
+.trans-filters select:focus{border-color:var(--teal)}
+
+/* METAS */
+.meta-stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:24px}
+.meta-stat-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius2);padding:18px 20px;display:flex;align-items:center;gap:14px}
+.meta-stat-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px}
+.meta-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius2);padding:18px 20px;margin-bottom:12px}
+.meta-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.meta-card-name{font-size:14px;font-weight:700}
+.meta-card-prazo{font-size:12px;color:var(--text2);margin-top:2px}
+.meta-card-vals{display:flex;justify-content:space-between;font-size:13px;margin-top:6px}
+.meta-card-pct{font-size:11px;color:var(--text2);margin-top:4px}
+.meta-actions{display:flex;gap:6px;margin-top:12px}
+.meta-action-btn{width:30px;height:30px;border-radius:7px;border:1px solid var(--border);background:var(--bg);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--text2);transition:all .15s}
+.meta-action-btn:hover{border-color:var(--teal);color:var(--teal);background:var(--teal-light)}
+
+/* HIST ITEM */
+.hist-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:var(--bg);border-radius:9px;margin-bottom:6px}
+
+/* TOAST */
+#toast{position:fixed;bottom:24px;right:24px;background:var(--text);color:#fff;padding:12px 20px;border-radius:10px;font-size:13.5px;font-weight:500;opacity:0;transition:opacity .25s;z-index:9999;pointer-events:none}
+#toast.show{opacity:1}
+
+/* INLINE TABLE INPUTS */
+#gestao-table td{padding:8px 10px;vertical-align:middle}
+#gestao-table thead th{padding:10px 10px}
+.row-input{width:100%;border:1.5px solid transparent;border-radius:6px;padding:6px 8px;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--text);background:transparent;outline:none;min-width:80px;transition:border .15s,background .15s}
+.row-input:focus,.row-input:hover{border-color:var(--teal);background:var(--white)}
+.row-new .row-input{border-color:var(--border2);background:var(--teal-light)}
+.row-saved .row-input{border-color:transparent;background:transparent}
+.row-saved .row-input:hover{border-color:var(--border2);background:#fafafa}
+.row-saved .row-input:focus{border-color:var(--teal);background:var(--white)}
+tr.row-new{background:#f0fdf9}
+/* SCROLLBAR */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:99px}
+
+/* RESPONSIVE */
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE — MOBILE FIRST
+═══════════════════════════════════════════ */
+
+/* Hamburger button (mobile only) */
+#menu-toggle{display:none;position:fixed;top:12px;left:12px;z-index:2000;width:40px;height:40px;border-radius:10px;background:var(--white);border:1.5px solid var(--border2);cursor:pointer;align-items:center;justify-content:center;box-shadow:var(--shadow2)}
+#menu-toggle svg{width:20px;height:20px;color:var(--text)}
+
+/* Sidebar overlay (mobile) */
+#sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:1400}
+
+/* ── TABLET (≤900px) ── */
+@media(max-width:900px){
+  .stat-grid{grid-template-columns:repeat(2,1fr)}
+  .dica-perfil-grid{grid-template-columns:1fr}
+  .admin-grid{grid-template-columns:1fr}
+  .fgrid3{grid-template-columns:1fr 1fr}
+  .sug-banner-grid{grid-template-columns:1fr}
+  .regras-grid{grid-template-columns:1fr 1fr}
+  .trans-stat-grid{grid-template-columns:repeat(2,1fr)}
+  .meta-stat-grid{grid-template-columns:1fr 1fr}
+  .dica-geral-grid{grid-template-columns:1fr}
+  .page{padding:24px 22px}
+}
+
+/* ── MOBILE (≤640px) ── */
+@media(max-width:640px){
+  /* Show hamburger, hide sidebar by default */
+  #menu-toggle{display:flex}
+  #sidebar-overlay{display:none}
+  #sidebar-overlay.open{display:block}
+
+  .sidebar{
+    position:fixed;left:-260px;top:0;height:100vh;z-index:1500;
+    width:240px;transition:left .25s cubic-bezier(.4,0,.2,1);
+    box-shadow:none
+  }
+  .sidebar.open{left:0;box-shadow:4px 0 24px rgba(0,0,0,.15)}
+
+  #app{flex-direction:column}
+  .main{width:100%;padding-top:0}
+
+  /* Page padding */
+  .page{padding:56px 14px 20px}
+
+  /* Topbar viewing banner */
+  .viewing-banner{padding:8px 14px;font-size:12px;flex-wrap:wrap;gap:6px}
+  .viewing-banner button{margin-left:0;width:100%}
+
+  /* Login */
+  #login-screen{padding:16px;align-items:flex-start;padding-top:40px}
+  .login-box{width:100%!important;padding:28px 20px;border-radius:16px}
+  .login-logo-name{font-size:20px}
+
+  /* Grids → single column */
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .fgrid{grid-template-columns:1fr}
+  .fgrid3{grid-template-columns:1fr}
+  .admin-grid{grid-template-columns:1fr}
+  .dica-perfil-grid{grid-template-columns:1fr}
+  .dica-geral-grid{grid-template-columns:1fr}
+  .regras-grid{grid-template-columns:1fr}
+  .trans-stat-grid{grid-template-columns:1fr 1fr}
+  .meta-stat-grid{grid-template-columns:1fr}
+  .sug-banner-grid{grid-template-columns:1fr}
+  .sugestoes-grid{grid-template-columns:1fr}
+  .detail-actions{grid-template-columns:1fr 1fr}
+
+  /* Banca top bar */
+  .gestao-top{flex-direction:column;align-items:flex-start}
+  .banca-info-cards{flex-direction:column;width:100%}
+  .banca-info-card{width:100%}
+
+  /* Table: allow horizontal scroll */
+  .table-wrap{overflow-x:auto}
+  table{min-width:500px}
+  #gestao-table{min-width:640px}
+
+  /* Banners */
+  .banner{padding:20px 18px;min-height:auto;flex-direction:column;gap:12px}
+  .banner-bg-icon{font-size:70px;right:-4px;bottom:-10px}
+  .banner-title{font-size:17px}
+  .banner-body{font-size:14px}
+  .banner-label{font-size:11px}
+  .banner-icon-left{width:42px;height:42px;font-size:20px}
+
+  /* Home tabs: scrollable row */
+  .home-info-tabs{flex-wrap:nowrap;overflow-x:auto;padding-bottom:6px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .home-info-tabs::-webkit-scrollbar{display:none}
+  .home-info-tab{white-space:nowrap;flex-shrink:0;padding:7px 12px;font-size:12px}
+
+  /* Home casa card */
+  .home-casa-card{margin:0 0 16px;border-radius:12px}
+
+  /* Modal */
+  .modal,.modal-wide{width:95vw!important;padding:18px 16px;border-radius:14px}
+
+  /* Calculadora */
+  #page-calculadora .card+.card,.calculadora-grid{display:flex;flex-direction:column}
+  #page-calculadora [style*="grid-template-columns"]{display:flex;flex-direction:column}
+
+  /* Alavancagem */
+  .alav-table{min-width:420px}
+
+  /* Page header actions */
+  .page-header{flex-direction:column;gap:10px}
+  .page-header .btn{width:100%;justify-content:center}
+
+  /* Metas card actions */
+  .meta-card-top{flex-direction:column;align-items:flex-start;gap:10px}
+  .meta-actions{flex-wrap:wrap}
+
+  /* Trans filters */
+  .trans-filters{flex-direction:column;align-items:stretch}
+  .trans-filters select{width:100%}
+
+  /* Admin user list */
+  .admin-user-item{padding:10px 14px}
+}
+
+/* ── SMALL MOBILE (≤380px) ── */
+@media(max-width:380px){
+  .stat-grid{grid-template-columns:1fr}
+  .trans-stat-grid{grid-template-columns:1fr}
+  .page{padding:52px 10px 16px}
+}
+
+</style>
+</head>
+<body>
+
+<!-- ────────── LOGIN ────────── -->
+<div id="login-screen">
+  <div class="login-box" style="width:460px">
+    <div class="login-logo">
+      <div class="login-logo-name">Kamael<span>Bankroll</span></div>
+      <div class="login-logo-sub">Gestão Inteligente de Banca</div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="login-tabs">
+      <button class="login-tab active" id="tab-login" onclick="switchLoginTab('login')">Entrar</button>
+      <button class="login-tab" id="tab-register" onclick="switchLoginTab('register')">Criar Conta</button>
+    </div>
+
+    <!-- LOGIN FORM -->
+    <div id="form-login">
+      <div class="login-title">Bem-vindo de volta</div>
+      <div class="login-sub">Faça login para acessar seu painel</div>
+      <div class="lf" style="margin-top:18px">
+        <div><label>Email ou Nome de Usuário</label><input id="l-email" type="text" placeholder="email ou usuário" autocomplete="username"></div>
+        <div><label>Senha</label><input id="l-pass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+        <button class="btn-login" onclick="doLogin()">Entrar →</button>
+        <div class="login-err" id="l-err">Email ou senha incorretos</div>
+      </div>
+      <div class="login-hint">👤 <strong>Conta de teste:</strong> teste1&#64;gmail.com / 123456</div>
+    </div>
+
+    <!-- REGISTER FORM -->
+    <div id="form-register" style="display:none">
+      <div class="login-title">Criar Conta</div>
+      <div class="login-sub">Preencha os dados para se cadastrar</div>
+      <div class="lf" style="margin-top:18px">
+        <div><label>Nome Completo</label><input id="r-nome" type="text" placeholder="Seu nome completo" autocomplete="name"></div>
+        <div><label>Telefone (WhatsApp)</label><input id="r-tel" type="tel" placeholder="(11) 99999-9999" oninput="maskTel(this)"></div>
+        <div><label>Email</label><input id="r-email" type="email" placeholder="seu&#64;email.com"></div>
+        <div><label>Nome de Usuário</label><input id="r-user" type="text" placeholder="Ex: joao123" oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9_]/g,'')"></div>
+        <div>
+          <label>Senha</label>
+          <div class="pass-reqs">
+            <div class="pass-reqs-title">REQUISITOS DA SENHA</div>
+            <div class="pass-req" id="req-len">Mínimo 8 caracteres</div>
+            <div class="pass-req" id="req-upper">Pelo menos 1 letra maiúscula</div>
+            <div class="pass-req" id="req-special">Pelo menos 1 caractere especial (!&#64;#$...)</div>
+          </div>
+          <input id="r-pass" type="password" placeholder="••••••••" oninput="checkPassReqs(this.value,'req')">
+        </div>
+        <div><label>Confirmar Senha</label><input id="r-conf" type="password" placeholder="••••••••"></div>
+        <button class="btn-login" onclick="doRegister()">Criar Conta →</button>
+        <div class="login-err" id="r-err">Erro ao criar conta</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ────────── APP ────────── -->
+<div id="app" style="display:none;flex-direction:row;height:100vh">
+  <button id="menu-toggle" onclick="toggleSidebar()" aria-label="Menu">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  </button>
+  <div id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-name">Kamael<span>Bankroll</span></div>
+      <div class="sidebar-logo-sub">Controle total das apostas</div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-item active" onclick="goPage('home',this)" id="nav-home">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Início
+      </div>
+      <div class="nav-item" onclick="goPage('admin',this)" id="nav-admin" style="display:none">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Admin
+      </div>
+      <div class="nav-section-label">OPERACIONAL</div>
+      <div class="nav-item" onclick="goPage('alavancagem',this)" id="nav-alavancagem">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Alavancagem
+      </div>
+      <div class="nav-item" onclick="goPage('calculadora',this)" id="nav-calculadora">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/></svg>
+        Calculadora
+      </div>
+      <div class="nav-item" onclick="goPage('dicas',this)" id="nav-dicas">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Dicas
+      </div>
+      <div class="nav-section-label">GESTÃO</div>
+      <div class="nav-item" onclick="goPage('gestao',this)" id="nav-gestao">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        Gerenciamento de Banca
+      </div>
+      <div class="nav-item" onclick="goPage('metas',this)" id="nav-metas">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+        Metas
+      </div>
+      <div class="nav-section-label">FINANCEIRO</div>
+      <div class="nav-item" onclick="goPage('transacoes',this)" id="nav-transacoes">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+        Transações
+      </div>
+    </nav>
+    <div class="sidebar-user">
+      <div class="user-row">
+        <div class="user-avatar" id="side-avatar">U</div>
+        <div class="user-email" id="side-email">usuario@email.com</div>
+      </div>
+      <div class="btn-sair" onclick="sair()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Sair
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main" id="main-content">
+    <div id="viewing-banner" class="viewing-banner" style="display:none">
+      👀 Você está gerenciando a conta de <strong id="viewing-name" style="margin:0 4px"></strong>
+      <button onclick="voltarMinhaConta()">↩ Voltar à minha conta</button>
+    </div>
+
+    <!-- HOME -->
+    <div class="page active" id="page-home">
+      <div class="home-welcome">
+        <h1>Bem-vindo 👋</h1>
+        <p>Selecione uma casa de aposta para começar</p>
+      </div>
+
+      <!-- Casa Ativa -->
+      <div class="home-casa-card">
+        <div style="display:flex;align-items:center;gap:14px">
+          <div class="home-casa-icon" id="home-casa-ico">🏠</div>
+          <div style="flex:1">
+            <div class="home-casa-label">Casa de Aposta Ativa</div>
+            <select class="fs" id="home-casa-sel" onchange="setCasaAtiva(this.value)" style="font-weight:600;font-size:15px;border:1.5px solid var(--border2)"></select>
+            <div id="home-outro-wrap" style="display:none;margin-top:8px">
+              <input class="fi" id="home-outro-input" placeholder="Nome da casa de apostas..." oninput="setCasaOutroNome(this.value)" style="font-size:13.5px">
+            </div>
+          </div>
+        </div>
+        <div class="home-info" id="home-info-msg" style="margin-top:10px"></div>
+        <div class="home-link" id="home-link" style="margin-top:5px;display:none" onclick="abrirLinkCasa()">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          <span id="home-link-text"></span>
+        </div>
+      </div>
+
+      <!-- Info Tabs -->
+      <div class="home-info-tabs">
+        <button class="home-info-tab active" onclick="setHomeTab('boas-vindas')">👋 Sobre o Sistema</button>
+        <button class="home-info-tab" onclick="setHomeTab('criador')">👤 Sobre o Criador</button>
+        <button class="home-info-tab" onclick="setHomeTab('sugestoes')">🚀 Sugestões do Sistema</button>
+        <button class="home-info-tab" onclick="setHomeTab('regras')">📋 Regras de Gestão</button>
+        <button class="home-info-tab" onclick="setHomeTab('aviso')">⚠️ Aviso Importante</button>
+      </div>
+
+      <!-- BANNER: Sobre o Sistema -->
+      <div class="home-info-panel active" id="htab-boas-vindas">
+        <div class="banner banner-teal">
+          <div class="banner-icon-left">👋</div>
+          <div class="banner-content">
+            <div class="banner-label">Bem-vindo ao sistema</div>
+            <div class="banner-title">KamaelBankroll</div>
+            <div class="banner-body">
+              <p>Seja bem-vindo ao <strong>KamaelBankroll</strong>, um sistema criado para auxiliar no controle e na gestão de apostas esportivas de forma organizada e responsável.</p>
+              <p>Aqui você pode registrar suas entradas, acompanhar sua evolução, analisar resultados e manter o controle da sua banca, sempre priorizando disciplina, consistência e gerenciamento adequado.</p>
+              <p>Utilize o sistema corretamente, siga uma gestão de banca e evite decisões impulsivas.</p>
+            </div>
+          </div>
+          <div class="banner-bg-icon">📊</div>
+        </div>
+      </div>
+
+      <!-- BANNER: Regras de Gestão -->
+      <div class="home-info-panel" id="htab-regras">
+        <div class="banner banner-dark">
+          <div class="banner-icon-left">📋</div>
+          <div class="banner-content">
+            <div class="banner-label">Gestão de Banca</div>
+            <div class="banner-title">Regras de Gestão</div>
+            <div class="banner-body">
+              <p>Boas práticas de gestão são a base para resultados consistentes. Defina um percentual fixo por aposta, respeite seu stop loss diário e nunca aposte por impulso.</p>
+              <p>Acesse a aba de Dicas para ver estratégias detalhadas por perfil — conservador, moderado ou agressivo.</p>
+            </div>
+            <div style="margin-top:14px;position:relative;z-index:1">
+              <button class="btn" style="background:rgba(255,255,255,.15);color:#fff;border:1.5px solid rgba(255,255,255,.3);backdrop-filter:blur(4px)" onclick="goPage('dicas',document.getElementById('nav-dicas'))">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                Ver todas as Dicas e Regras →
+              </button>
+            </div>
+          </div>
+          <div class="banner-bg-icon">🛡️</div>
+        </div>
+      </div>
+
+      <!-- BANNER: Aviso Importante -->
+      <div class="home-info-panel" id="htab-aviso">
+        <div class="banner banner-gold">
+          <div class="banner-icon-left">⚠️</div>
+          <div class="banner-content">
+            <div class="banner-label">Leia com atenção</div>
+            <div class="banner-title">Aviso Importante</div>
+            <div class="banner-body">
+              <p>Apostas esportivas envolvem riscos e <strong>não garantem lucro</strong>. Este sistema tem como objetivo ajudar no controle e organização, mas os resultados dependem exclusivamente das decisões do usuário.</p>
+              <p>Aposte sempre com responsabilidade e <strong>nunca utilize valores que possam comprometer sua vida financeira</strong>.</p>
+              <p>Disciplina e controle são mais importantes do que lucro rápido.</p>
+            </div>
+          </div>
+          <div class="banner-bg-icon">💰</div>
+        </div>
+      </div>
+
+      <!-- BANNER: Sobre o Criador -->
+      <div class="home-info-panel" id="htab-criador">
+        <div class="banner banner-blue">
+          <div class="banner-icon-left">👤</div>
+          <div class="banner-content">
+            <div class="banner-label">Quem está por trás</div>
+            <div class="banner-title">Sobre o Criador</div>
+            <div class="banner-body">
+              <p>Sistema desenvolvido por <strong>Túlio Cavalcanti (Kamael)</strong>, analista de apostas com foco em gestão de banca, controle emocional e análise de desempenho no mercado esportivo.</p>
+              <p>O <strong>KamaelBankroll</strong> foi criado para auxiliar apostadores a manter organização, disciplina e controle financeiro, seguindo princípios de gerenciamento profissional voltados para resultados consistentes no longo prazo.</p>
+              <p>A proposta é reduzir erros comuns, evitar apostas impulsivas e fortalecer o uso da gestão de banca como base para evolução.</p>
+            </div>
+          </div>
+          <div class="banner-bg-icon">🏆</div>
+        </div>
+      </div>
+
+      <!-- BANNER: Sugestões do Sistema -->
+      <div class="home-info-panel" id="htab-sugestoes">
+        <div class="sug-banner-grid">
+          <div class="sug-banner">
+            <div class="sug-banner-bg">📋</div>
+            <div class="sug-banner-icon" style="background:var(--teal-light)">📋</div>
+            <div class="sug-banner-title">Adicione seu primeiro registro</div>
+            <div class="sug-banner-desc">Vá em "Gerenciamento de Banca" e registre seu primeiro resultado do dia com data, depósito e resultado.</div>
+          </div>
+          <div class="sug-banner">
+            <div class="sug-banner-bg">🏠</div>
+            <div class="sug-banner-icon" style="background:var(--gold-bg)">🏠</div>
+            <div class="sug-banner-title">Configure sua casa de apostas</div>
+            <div class="sug-banner-desc">Selecione a casa ativa acima para que todos os dados fiquem organizados por plataforma de apostas.</div>
+          </div>
+          <div class="sug-banner">
+            <div class="sug-banner-bg">🎯</div>
+            <div class="sug-banner-icon" style="background:#EDE9FE">🎯</div>
+            <div class="sug-banner-title">Defina suas metas financeiras</div>
+            <div class="sug-banner-desc">Crie metas na aba Metas e faça aportes periódicos para acompanhar seu progresso rumo aos objetivos.</div>
+          </div>
+          <div class="sug-banner">
+            <div class="sug-banner-bg">📈</div>
+            <div class="sug-banner-icon" style="background:var(--teal-light)">📈</div>
+            <div class="sug-banner-title">Simule com a Alavancagem</div>
+            <div class="sug-banner-desc">Use a tabela de alavancagem para simular o crescimento composto da banca entrada por entrada.</div>
+          </div>
+          <div class="sug-banner">
+            <div class="sug-banner-bg">💸</div>
+            <div class="sug-banner-icon" style="background:var(--green-bg)">💸</div>
+            <div class="sug-banner-title">Registre depósitos e saques</div>
+            <div class="sug-banner-desc">Na aba Transações, controle todos os depósitos e saques por casa para ter visão financeira completa.</div>
+          </div>
+          <div class="sug-banner">
+            <div class="sug-banner-bg">🧮</div>
+            <div class="sug-banner-icon" style="background:var(--blue-bg)">🧮</div>
+            <div class="sug-banner-title">Calcule seu stake ideal</div>
+            <div class="sug-banner-desc">Use a Calculadora para saber exatamente quanto apostar com base no tamanho da sua banca e perfil de risco.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ADMIN -->
+    <div class="page" id="page-admin">
+      <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between">
+        <div>
+          <div class="page-title" style="display:flex;align-items:center;gap:8px">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Painel Administrativo
+          </div>
+          <div class="page-sub">Gerencie todos os usuários do sistema</div>
+        </div>
+        <button class="btn btn-outline" onclick="renderAdmin()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+          Atualizar
+        </button>
+      </div>
+      <div class="admin-grid">
+        <div class="admin-user-list">
+          <div class="admin-list-head">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+            Usuários (<span id="admin-count">0</span>)
+            <button class="btn btn-sm btn-primary" style="margin-left:auto" onclick="openM('m-adduser')">+ Novo</button>
+          </div>
+          <div id="admin-user-list"></div>
+        </div>
+        <div class="admin-detail" id="admin-detail">
+          <div class="empty-state"><div class="empty-icon">👤</div><div class="empty-text">Selecione um usuário para ver os detalhes</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ALAVANCAGEM -->
+    <div class="page" id="page-alavancagem">
+      <div class="page-header" style="text-align:center">
+        <div class="page-title">Tabela de Alavancagem</div>
+        <div class="page-sub">Simule o crescimento composto entrada por entrada</div>
+      </div>
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-t">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          Configuração
+        </div>
+        <div class="fgrid3">
+          <div class="fg"><label class="fl">Banca Inicial (R$)</label><input class="fi" id="al-banca" type="number" value="100" oninput="calcAlav()"></div>
+          <div class="fg"><label class="fl">Meta por Entrada (%)</label><input class="fi" id="al-meta" type="number" value="10" oninput="calcAlav()"></div>
+          <div class="fg"><label class="fl">Número de Entradas</label><input class="fi" id="al-entradas" type="number" value="10" oninput="calcAlav()"></div>
+        </div>
+      </div>
+      <div class="table-wrap" style="margin-bottom:20px">
+        <div class="table-head">
+          <div class="table-title" id="alav-title">Tabela de Alavancagem</div>
+        </div>
+        <div style="overflow-x:auto"><table class="alav-table"><thead><tr><th>Entrada</th><th>Banca antes</th><th id="alav-meta-col" style="color:var(--teal)">Meta 10%</th><th>Banca depois</th></tr></thead><tbody id="alav-body"></tbody></table></div>
+      </div>
+      <div class="stat-grid" id="alav-summary"></div>
+    </div>
+
+    <!-- CALCULADORA -->
+    <div class="page" id="page-calculadora">
+      <div class="page-header" style="text-align:center">
+        <div class="page-title">Calculadora de Stake</div>
+        <div class="page-sub">Calcule o valor ideal de aposta e simule o crescimento da banca</div>
+      </div>
+      <div class="card" style="margin-bottom:20px">
+        <div style="display:flex;align-items:center;gap:14px">
+          <div style="width:44px;height:44px;background:var(--teal-light);border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px">📈</div>
+          <div class="fg" style="margin:0;flex:1"><label class="fl">Valor da Banca (R$)</label><input class="fi" id="calc-banca" type="number" placeholder="Ex: 500,00" oninput="calcStake()"></div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+        <div class="card">
+          <div class="card-t">
+            <span style="color:var(--teal);font-size:17px">%</span>
+            Porcentagem Fixa
+            <span style="width:18px;height:18px;border-radius:50%;background:var(--border);display:inline-flex;align-items:center;justify-content:center;font-size:10px;color:var(--text2);margin-left:auto;cursor:help" title="Usa uma porcentagem fixa da banca para cada aposta">ℹ</span>
+          </div>
+          <div class="page-sub" style="margin-bottom:14px">Calcule o stake usando uma porcentagem fixa da sua banca</div>
+          <div class="fg"><label class="fl">Porcentagem da Banca (%)</label><input class="fi" id="calc-pct" type="number" value="0" oninput="calcStake()"></div>
+          <div style="font-size:12px;color:var(--text2);margin-bottom:10px">Recomendado: 1% a 5% dependendo do seu perfil de risco</div>
+          <div style="display:flex;gap:6px;margin-bottom:14px">
+            <button class="btn btn-outline btn-sm" onclick="setPct(1)">1%</button>
+            <button class="btn btn-outline btn-sm" onclick="setPct(2)">2%</button>
+            <button class="btn btn-outline btn-sm" onclick="setPct(3)">3%</button>
+            <button class="btn btn-outline btn-sm" onclick="setPct(5)">5%</button>
+          </div>
+          <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="calcStake()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/></svg>
+            Calcular Stake
+          </button>
+          <div id="calc-result" style="margin-top:14px;display:none;background:var(--teal-light);padding:14px;border-radius:10px;text-align:center">
+            <div style="font-size:12px;color:var(--teal);font-weight:600">Stake Recomendado</div>
+            <div style="font-size:28px;font-weight:800;color:var(--teal)" id="calc-stake-val">R$ 0,00</div>
+          </div>
+          <div style="margin-top:16px">
+            <div style="font-size:13px;font-weight:700;margin-bottom:10px">📊 Recomendação por Perfil:</div>
+            <div style="background:#F9FFF9;border:1px solid #D1FAE5;border-radius:8px;padding:10px 14px;margin-bottom:6px;display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--green-text)">Conservador</span><span style="color:var(--green-text);font-weight:600">1% - 2%</span></div>
+            <div style="background:var(--gold-bg);border:1px solid #FDE68A;border-radius:8px;padding:10px 14px;margin-bottom:6px;display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--gold-text)">Moderado</span><span style="color:var(--gold-text);font-weight:600">2% - 3%</span></div>
+            <div style="background:var(--red-bg);border:1px solid #FCA5A5;border-radius:8px;padding:10px 14px;display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--red-text)">Agressivo</span><span style="color:var(--red-text);font-weight:600">3% - 5%</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-t">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            Simulador de Crescimento
+          </div>
+          <div class="page-sub" style="margin-bottom:14px">Veja o crescimento composto da sua banca dia a dia</div>
+          <div class="fg"><label class="fl">Banca Inicial (R$)</label><input class="fi" id="sim-banca" type="number" value="100"></div>
+          <div class="fg"><label class="fl">Meta Diária (%)</label><input class="fi" id="sim-meta" type="number" value="5"></div>
+          <div class="fg"><label class="fl">Período (Dias)</label><input class="fi" id="sim-dias" type="number" value="10"></div>
+          <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="simularCrescimento()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/></svg>
+            Simular
+          </button>
+          <div id="sim-result" style="margin-top:14px;display:none">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+              <div style="background:var(--teal-light);padding:14px;border-radius:10px;text-align:center">
+                <div style="font-size:11px;color:var(--teal);font-weight:700;margin-bottom:4px">BANCA FINAL</div>
+                <div style="font-size:20px;font-weight:800;color:var(--teal)" id="sim-final">R$ 0</div>
+              </div>
+              <div style="background:var(--green-bg);padding:14px;border-radius:10px;text-align:center">
+                <div style="font-size:11px;color:var(--green-text);font-weight:700;margin-bottom:4px">LUCRO</div>
+                <div style="font-size:20px;font-weight:800;color:var(--green-text)" id="sim-lucro">+0%</div>
+                <div style="font-size:11px;color:var(--green-text)" id="sim-lucro-brl"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DICAS -->
+    <div class="page" id="page-dicas">
+      <div class="page-header">
+        <div class="page-title">Dicas de Gestão</div>
+        <div class="page-sub">Estratégias e recomendações para cada perfil de apostador.</div>
+      </div>
+      <div class="dica-perfil-grid">
+        <div class="dica-card">
+          <div class="dica-card-icon" style="background:#F0FDF4"><span>🛡️</span></div>
+          <div style="font-size:16px;font-weight:800;color:var(--green-text);margin-bottom:4px">Conservador</div>
+          <div style="font-size:13px;color:var(--text2);margin-bottom:8px">1% a 3% diário</div>
+          <div style="font-size:12px;color:var(--text2);margin-bottom:8px">Ideal para quem está começando ou prioriza a preservação da banca.</div>
+          <ul class="dica-list">
+            <li>Stake fixo de 1-3% da banca por aposta</li>
+            <li>Stop loss diário de 5-10% da banca</li>
+            <li>Foco em odds entre 1.50 e 2.00</li>
+            <li>Máximo de 3-5 apostas por dia</li>
+            <li>Crescimento lento mas consistente</li>
+          </ul>
+        </div>
+        <div class="dica-card">
+          <div class="dica-card-icon" style="background:var(--gold-bg)"><span>⚠️</span></div>
+          <div style="font-size:16px;font-weight:800;color:var(--gold-text);margin-bottom:4px">Moderado</div>
+          <div style="font-size:13px;color:var(--text2);margin-bottom:8px">3% a 9% diário</div>
+          <div style="font-size:12px;color:var(--text2);margin-bottom:8px">Para apostadores com experiência que buscam crescimento mais rápido.</div>
+          <ul class="dica-list">
+            <li>Stake de 3-5% da banca por aposta</li>
+            <li>Stop loss diário de 15-20% da banca</li>
+            <li>Odds entre 1.80 e 2.50 são aceitáveis</li>
+            <li>Máximo de 5-8 apostas por dia</li>
+            <li>Balanço entre risco e retorno</li>
+          </ul>
+        </div>
+        <div class="dica-card">
+          <div class="dica-card-icon" style="background:var(--red-bg)"><span>⚡</span></div>
+          <div style="font-size:16px;font-weight:800;color:var(--red-text);margin-bottom:4px">Agressivo</div>
+          <div style="font-size:13px;color:var(--text2);margin-bottom:8px">Acima de 10% diário</div>
+          <div style="font-size:12px;color:var(--text2);margin-bottom:8px">Apenas para profissionais com alta tolerância ao risco.</div>
+          <ul class="dica-list">
+            <li>Stake de 5-10% da banca por aposta</li>
+            <li>Stop loss diário de 30% da banca</li>
+            <li>Aceita odds maiores (acima de 2.50)</li>
+            <li>Volume maior de apostas</li>
+            <li>Alto risco de grandes perdas</li>
+          </ul>
+        </div>
+      </div>
+      <div style="font-size:15px;font-weight:700;margin-bottom:14px">Dicas Gerais</div>
+      <div class="dica-geral-grid">
+        <div class="dica-geral-card"><div style="width:38px;height:38px;border-radius:10px;background:var(--teal-light);display:flex;align-items:center;justify-content:center;flex-shrink:0">🎯</div><div><div style="font-size:13.5px;font-weight:700">Defina Metas Realistas</div><div style="font-size:12px;color:var(--text2);margin-top:3px">Estabeleça metas diárias e mensais alcançáveis. Não seja ganancioso.</div></div></div>
+        <div class="dica-geral-card"><div style="width:38px;height:38px;border-radius:10px;background:var(--teal-light);display:flex;align-items:center;justify-content:center;flex-shrink:0">📈</div><div><div style="font-size:13.5px;font-weight:700">Acompanhe Seus Resultados</div><div style="font-size:12px;color:var(--text2);margin-top:3px">Registre todas as apostas. Analise seus erros e acertos regularmente.</div></div></div>
+        <div class="dica-geral-card"><div style="width:38px;height:38px;border-radius:10px;background:var(--teal-light);display:flex;align-items:center;justify-content:center;flex-shrink:0">📚</div><div><div style="font-size:13.5px;font-weight:700">Estude Constantemente</div><div style="font-size:12px;color:var(--text2);margin-top:3px">O conhecimento é seu maior aliado. Estude estatísticas, times e mercados.</div></div></div>
+        <div class="dica-geral-card"><div style="width:38px;height:38px;border-radius:10px;background:var(--teal-light);display:flex;align-items:center;justify-content:center;flex-shrink:0">✅</div><div><div style="font-size:13.5px;font-weight:700">Discipline é Tudo</div><div style="font-size:12px;color:var(--text2);margin-top:3px">Siga sua estratégia. Não aposte por impulso ou para recuperar perdas.</div></div></div>
+      </div>
+      <div class="card">
+        <div class="card-t" style="color:var(--gold);font-size:15px">🏆 Regras de Ouro</div>
+        <div class="regras-grid">
+          <div class="regra-item"><div class="regra-num">1.</div><div class="regra-title">Nunca aposte mais do que pode perder</div><div class="regra-desc">Sua banca deve ser dinheiro "separado"</div></div>
+          <div class="regra-item"><div class="regra-num">2.</div><div class="regra-title">Respeite sempre o stop loss</div><div class="regra-desc">Dias ruins acontecem, proteja sua banca</div></div>
+          <div class="regra-item"><div class="regra-num">3.</div><div class="regra-title">Não aposte por emoção</div><div class="regra-desc">Decisões racionais = lucro a longo prazo</div></div>
+          <div class="regra-item"><div class="regra-num">4.</div><div class="regra-title">Diversifique suas apostas</div><div class="regra-desc">Não coloque tudo em uma única aposta</div></div>
+          <div class="regra-item"><div class="regra-num">5.</div><div class="regra-title">Mantenha registros detalhados</div><div class="regra-desc">Dados são sua melhor ferramenta de análise</div></div>
+          <div class="regra-item"><div class="regra-num">6.</div><div class="regra-title">Saiba quando parar</div><div class="regra-desc">Tanto em dias bons quanto ruins</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GESTÃO DE BANCA -->
+    <div class="page" id="page-gestao">
+      <div class="page-header">
+        <div class="page-title">Gestão de Banca</div>
+        <div class="page-sub">Controle diário da sua banca com entradas manuais.</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap">
+        <div>
+          <div class="casa-select">
+            <select id="gestao-casa-sel" onchange="setGestaoC(this.value)"></select>
+          </div>
+          <div id="gestao-outro-wrap" style="display:none;margin-top:6px">
+            <input class="fi" id="gestao-outro-input" placeholder="Nome da casa..." oninput="setGestaoOutroNome(this.value)" style="font-size:13px;padding:7px 10px">
+          </div>
+        </div>
+        <div class="banca-info-cards">
+          <div class="banca-info-card">
+            <div class="banca-info-label">Banca inicial</div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <div class="banca-info-val" id="g-banca-ini">R$ 0,00</div>
+              <button class="editar-banca-btn" onclick="editarBancaInicial()" title="Editar banca inicial">✏️</button>
+            </div>
+          </div>
+          <div class="banca-info-card">
+            <div class="banca-info-label">Banca atual</div>
+            <div class="banca-info-val green" id="g-banca-atual">R$ 0,00</div>
+          </div>
+        </div>
+        <button class="btn btn-primary" style="margin-left:auto" onclick="adicionarLinhaGestao()">+ Adicionar linha</button>
+      </div>
+      <div class="table-wrap">
+        <div style="overflow-x:auto" id="gestao-table-wrap"><table id="gestao-table"><thead><tr><th>Data</th><th>Inicial</th><th>Depósito</th><th>Saque</th><th>Resultado</th><th style="color:var(--teal);white-space:nowrap">% Banca</th><th style="color:var(--text)">Final</th><th>Ações</th></tr></thead><tbody id="gestao-body"></tbody></table></div>
+      </div>
+      <!-- Perfil de Risco at bottom -->
+      <div class="card" style="margin-top:20px">
+        <div class="card-t">🛡️ Perfil de Risco</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+          <div id="prf-c" class="card" style="cursor:pointer;border-color:var(--green);background:var(--green-bg)" onclick="selPrf('c')"><div style="font-weight:700;color:var(--green-text);margin-bottom:2px">Conservador</div><div style="font-size:12px;color:var(--text2)">1% a 3% diário — Menor risco</div></div>
+          <div id="prf-m" class="card" style="cursor:pointer" onclick="selPrf('m')"><div style="font-weight:700;color:var(--gold-text);margin-bottom:2px">Moderado</div><div style="font-size:12px;color:var(--text2)">3% a 9% diário — Risco médio</div></div>
+          <div id="prf-a" class="card" style="cursor:pointer" onclick="selPrf('a')"><div style="font-weight:700;color:var(--red-text);margin-bottom:2px">Agressivo</div><div style="font-size:12px;color:var(--text2)">Acima de 10% diário — Alto risco</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- METAS -->
+    <div class="page" id="page-metas">
+      <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between">
+        <div>
+          <div class="page-title">Metas</div>
+          <div class="page-sub">Defina e acompanhe seus objetivos financeiros.</div>
+        </div>
+        <button class="btn btn-primary" onclick="openM('m-meta')">+ Nova Meta</button>
+      </div>
+      <div class="meta-stat-grid">
+        <div class="meta-stat-card">
+          <div class="meta-stat-icon" style="background:var(--teal-light)">🎯</div>
+          <div><div style="font-size:12px;color:var(--text2)">Metas Ativas</div><div style="font-size:28px;font-weight:800" id="mt-ativas">0</div></div>
+        </div>
+        <div class="meta-stat-card">
+          <div class="meta-stat-icon" style="background:var(--green-bg)">🏆</div>
+          <div><div style="font-size:12px;color:var(--text2)">Metas Concluídas</div><div style="font-size:28px;font-weight:800" id="mt-conc">0</div></div>
+        </div>
+      </div>
+      <div style="font-size:14px;font-weight:700;color:var(--teal);margin-bottom:14px;display:flex;align-items:center;gap:6px">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+        Metas em Andamento
+      </div>
+      <div id="mt-list"></div>
+    </div>
+
+    <!-- TRANSAÇÕES -->
+    <div class="page" id="page-transacoes">
+      <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between">
+        <div>
+          <div class="page-title">Depósitos & Saques</div>
+          <div class="page-sub">Controle financeiro completo por casa de apostas</div>
+        </div>
+        <button class="btn btn-primary" onclick="openM('m-trans')">+ Nova Transação</button>
+      </div>
+      <div class="trans-stat-grid">
+        <div class="trans-stat">
+          <div class="trans-stat-icon" style="background:var(--green-bg)">💰</div>
+          <div><div style="font-size:12px;color:var(--text2)">Total Depósitos</div><div style="font-size:18px;font-weight:700;color:var(--green-text)" id="tr-dep">R$ 0,00</div></div>
+        </div>
+        <div class="trans-stat">
+          <div class="trans-stat-icon" style="background:var(--red-bg)">📤</div>
+          <div><div style="font-size:12px;color:var(--text2)">Total Saques</div><div style="font-size:18px;font-weight:700;color:var(--red-text)" id="tr-saq">R$ 0,00</div></div>
+        </div>
+        <div class="trans-stat">
+          <div class="trans-stat-icon" style="background:var(--teal-light)">💳</div>
+          <div><div style="font-size:12px;color:var(--text2)">Saldo Líquido</div><div style="font-size:18px;font-weight:700;color:var(--teal)" id="tr-saldo">R$ 0,00</div></div>
+        </div>
+        <div class="trans-stat">
+          <div class="trans-stat-icon" style="background:var(--gold-bg)">⏳</div>
+          <div><div style="font-size:12px;color:var(--text2)">Pendentes</div><div style="font-size:18px;font-weight:700;color:var(--gold-text)" id="tr-pend">0</div></div>
+        </div>
+      </div>
+      <div class="trans-filters">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text2)" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+        <select id="tr-f-casa" onchange="renderTransacoes()"><option value="">Todas as casas</option></select>
+        <select id="tr-f-tipo" onchange="renderTransacoes()"><option value="">Todos os tipos</option><option>Depósito</option><option>Saque</option><option>Bônus</option></select>
+        <select id="tr-f-metodo" onchange="renderTransacoes()"><option value="">Todos os métodos</option><option>PIX</option><option>TED</option><option>Cartão</option><option>Crypto</option></select>
+        <select id="tr-f-status" onchange="renderTransacoes()"><option value="">Todos os status</option><option>Concluído</option><option>Pendente</option><option>Cancelado</option></select>
+      </div>
+      <div class="table-wrap">
+        <div style="overflow-x:auto"><table><thead><tr><th>Data</th><th>Tipo</th><th>Casa</th><th>Valor</th><th>Método</th><th>Status</th><th>Observação</th><th>Ações</th></tr></thead><tbody id="trans-body"></tbody></table></div>
+      </div>
+    </div>
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<!-- ════════════════ MODALS ════════════════ -->
+
+<!-- ADD USER -->
+<div class="mo" id="m-adduser">
+  <div class="modal">
+    <div class="mh"><div class="mt2">➕ Novo Usuário</div><button class="mc" onclick="closeM('m-adduser')">✕</button></div>
+    <div class="fg"><label class="fl">Email</label><input class="fi" id="au-email" type="email" placeholder="usuario&#64;email.com"></div>
+    <div class="fg"><label class="fl">Tipo de Conta</label><select class="fs" id="au-tipo"><option>Usuário</option><option>Admin</option></select></div>
+    <div class="fg"><label class="fl">Senha Inicial</label><input class="fi" id="au-pass" type="password" placeholder="mínimo 4 caracteres"></div>
+    <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:4px" onclick="addUser()">Criar Usuário</button>
+  </div>
+</div>
+
+<!-- CHANGE PASS -->
+<div class="mo" id="m-senha">
+  <div class="modal">
+    <div class="mh"><div class="mt2">🔑 Definir Senha</div><button class="mc" onclick="closeM('m-senha')">✕</button></div>
+    <div id="senha-email-info" style="font-size:13px;color:var(--text2);margin-bottom:14px;padding:10px 12px;background:var(--bg);border-radius:8px"></div>
+    <div class="pass-reqs">
+      <div class="pass-reqs-title">REQUISITOS DA SENHA</div>
+      <div class="pass-req" id="sreq-len">Mínimo 8 caracteres</div>
+      <div class="pass-req" id="sreq-upper">Pelo menos 1 letra maiúscula</div>
+      <div class="pass-req" id="sreq-special">Pelo menos 1 caractere especial (!&#64;#$...)</div>
+    </div>
+    <div class="fg"><label class="fl">Nova Senha</label><input class="fi" id="s-nova" type="password" placeholder="••••••••" oninput="checkPassReqs(this.value,'sreq')"></div>
+    <div class="fg"><label class="fl">Confirmar Senha</label><input class="fi" id="s-conf" type="password"></div>
+    <div style="display:flex;gap:9px;margin-top:4px">
+      <button class="btn btn-outline" style="flex:1;justify-content:center" onclick="closeM('m-senha')">Cancelar</button>
+      <button class="btn btn-primary" style="flex:1;justify-content:center" onclick="salvarSenha()">Salvar Senha</button>
+    </div>
+  </div>
+</div>
+
+<!-- gestao modal removed - inline rows -->
+
+<!-- META -->
+<div class="mo" id="m-meta">
+  <div class="modal modal-wide">
+    <div class="mh"><div class="mt2">🎯 Nova Meta</div><button class="mc" onclick="closeM('m-meta')">✕</button></div>
+    <div class="fg"><label class="fl">Nome da Meta</label><input class="fi" id="mt-titulo" placeholder="Ex: Viagem para Europa"></div>
+    <div class="fg">
+      <label class="fl">Ícone</label>
+      <div class="ico-grid" id="mt-ico-grid">
+        <button class="ico-btn sel" onclick="selIco(this,'⚽')">⚽</button>
+        <button class="ico-btn" onclick="selIco(this,'💰')">💰</button>
+        <button class="ico-btn" onclick="selIco(this,'🏆')">🏆</button>
+        <button class="ico-btn" onclick="selIco(this,'📈')">📈</button>
+        <button class="ico-btn" onclick="selIco(this,'🎯')">🎯</button>
+        <button class="ico-btn" onclick="selIco(this,'🏠')">🏠</button>
+        <button class="ico-btn" onclick="selIco(this,'✈️')">✈️</button>
+        <button class="ico-btn" onclick="selIco(this,'🚗')">🚗</button>
+        <button class="ico-btn" onclick="selIco(this,'📱')">📱</button>
+        <button class="ico-btn" onclick="selIco(this,'🎓')">🎓</button>
+        <button class="ico-btn" onclick="selIco(this,'💊')">💊</button>
+        <button class="ico-btn" onclick="selIco(this,'⭐')">⭐</button>
+      </div>
+      <input type="hidden" id="mt-ico" value="⚽">
+    </div>
+    <div class="fgrid">
+      <div class="fg"><label class="fl">Valor Alvo (R$)</label><input class="fi" id="mt-alvo" type="number" placeholder="25000"></div>
+      <div class="fg"><label class="fl">Valor Atual (R$)</label><input class="fi" id="mt-atual" type="number" placeholder="0" value="0"></div>
+    </div>
+    <div class="fg"><label class="fl">Prazo (ex: Dez 2025)</label><input class="fi" id="mt-prazo" placeholder="Ex: Dez 2025"></div>
+    <div style="display:flex;gap:9px;margin-top:6px">
+      <button class="btn btn-outline" style="flex:1;justify-content:center" onclick="closeM('m-meta')">Cancelar</button>
+      <button class="btn btn-primary" style="flex:1;justify-content:center" onclick="addMeta()">🎯 Criar Meta</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT META -->
+<div class="mo" id="m-edit-meta">
+  <div class="modal modal-wide">
+    <div class="mh"><div class="mt2">✏️ Editar Meta</div><button class="mc" onclick="closeM('m-edit-meta')">✕</button></div>
+    <div class="tab-bar" style="margin-bottom:16px">
+      <button class="tab active" id="em-tab-info" onclick="setMetaTab('info')">📝 Informações</button>
+      <button class="tab" id="em-tab-aporte" onclick="setMetaTab('aporte')">💸 Aporte</button>
+      <button class="tab" id="em-tab-hist" onclick="setMetaTab('hist')">📋 Histórico</button>
+    </div>
+    <div id="em-info">
+      <div class="fg"><label class="fl">Nome da Meta</label><input class="fi" id="em-titulo"></div>
+      <div class="fg">
+        <label class="fl">Ícone</label>
+        <div class="ico-grid" id="em-ico-grid">
+          <button class="ico-btn" onclick="selIcoEdit(this,'⚽')">⚽</button>
+          <button class="ico-btn" onclick="selIcoEdit(this,'💰')">💰</button>
+          <button class="ico-btn" onclick="selIcoEdit(this,'🏆')">🏆</button>
+          <button class="ico-btn" onclick="selIcoEdit(this,'📈')">📈</button>
+          <button class="ico-btn" onclick="selIcoEdit(this,'🎯')">🎯</button>
+          <button class="ico-btn" onclick="selIcoEdit(this,'🏠')">🏠</button>
+          <button class="ico-btn" onclick="selIcoEdit(this,'✈️')">✈️</button>
+          <button class="ico-btn" onclick="selIcoEdit(this,'🚗')">🚗</button>
+          <button class="ico-btn" onclick="selIcoEdit(this,'📱')">📱</button>
+          <button class="ico-btn" onclick="selIcoEdit(this,'🎓')">🎓</button>
+          <button class="ico-btn" onclick="selIcoEdit(this,'💊')">💊</button>
+          <button class="ico-btn" onclick="selIcoEdit(this,'⭐')">⭐</button>
+        </div>
+        <input type="hidden" id="em-ico" value="⚽">
+      </div>
+      <div class="fgrid">
+        <div class="fg"><label class="fl">Valor Alvo (R$)</label><input class="fi" id="em-alvo" type="number"></div>
+        <div class="fg"><label class="fl">Valor Atual (R$)</label><input class="fi" id="em-atual" type="number"></div>
+      </div>
+      <div class="fg"><label class="fl">Prazo</label><input class="fi" id="em-prazo" placeholder="Ex: Dez 2025"></div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="salvarEditMeta()">💾 Salvar Alterações</button>
+    </div>
+    <div id="em-aporte" style="display:none">
+      <div style="background:var(--bg);border-radius:10px;padding:14px;margin-bottom:16px;display:flex;gap:12px">
+        <div style="flex:1;text-align:center"><div style="font-size:11px;color:var(--text2);margin-bottom:4px">Valor atual</div><div style="font-size:18px;font-weight:800;color:var(--gold)" id="em-ap-atual">R$ 0</div></div>
+        <div style="width:1px;background:var(--border)"></div>
+        <div style="flex:1;text-align:center"><div style="font-size:11px;color:var(--text2);margin-bottom:4px">Falta para meta</div><div style="font-size:18px;font-weight:800;color:var(--teal)" id="em-ap-falta">R$ 0</div></div>
+      </div>
+      <div class="fg"><label class="fl">Valor do Aporte (R$)</label><input class="fi" id="em-aporte-val" type="number" placeholder="Ex: 100" step="0.01"></div>
+      <div class="fg"><label class="fl">Descrição (opcional)</label><input class="fi" id="em-aporte-desc" placeholder="Ex: Lucro da semana"></div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="fazerAporte()">💸 Confirmar Aporte</button>
+    </div>
+    <div id="em-hist" style="display:none">
+      <div id="em-hist-list" style="max-height:300px;overflow-y:auto"></div>
+    </div>
+  </div>
+</div>
+
+<!-- TRANSAÇÃO -->
+<div class="mo" id="m-trans">
+  <div class="modal">
+    <div class="mh"><div class="mt2" id="trans-modal-title">Nova Transação</div><button class="mc" onclick="closeM('m-trans')">✕</button></div>
+    <div class="fgrid">
+      <div class="fg"><label class="fl">Data *</label><input class="fi" id="tr-data" type="date"></div>
+      <div class="fg"><label class="fl">Tipo *</label><select class="fs" id="tr-tipo"><option>Depósito</option><option>Saque</option><option>Bônus</option></select></div>
+    </div>
+    <div class="fg"><label class="fl">Valor (R$) *</label><input class="fi" id="tr-valor" type="number" step="0.01" placeholder="0,00"></div>
+    <div class="fg"><label class="fl">Site / Casa *</label><select class="fs" id="tr-casa"><option value="">Selecione...</option></select></div>
+    <div class="fg"><label class="fl">Método *</label><select class="fs" id="tr-metodo"><option value="">Selecione...</option><option>PIX</option><option>TED</option><option>Cartão</option><option>Crypto</option><option>Outro</option></select></div>
+    <div class="fg"><label class="fl">Status</label><select class="fs" id="tr-status"><option>Concluído</option><option>Pendente</option><option>Cancelado</option></select></div>
+    <div class="fg"><label class="fl">Observação</label><textarea class="fi" id="tr-obs" rows="3" placeholder="Ex: bônus, rollover, saque parcial..." style="resize:vertical"></textarea></div>
+    <div style="display:flex;gap:9px;margin-top:4px">
+      <button class="btn btn-outline" style="flex:1;justify-content:center" onclick="closeM('m-trans')">Cancelar</button>
+      <button class="btn btn-primary" style="flex:1;justify-content:center" id="trans-save-btn" onclick="salvarTrans()">Registrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- BANCA INICIAL EDIT -->
+<div class="mo" id="m-banca-ini">
+  <div class="modal" style="width:380px">
+    <div class="mh"><div class="mt2">💰 Banca Inicial</div><button class="mc" onclick="closeM('m-banca-ini')">✕</button></div>
+    <div class="fg"><label class="fl">Valor da Banca Inicial (R$)</label><input class="fi" id="bi-val" type="number" placeholder="1000"></div>
+    <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="salvarBancaInicial()">💾 Salvar</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════
+// DATA
+// ══════════════════════════════════════════════
+const CASAS=[
+  {id:'bet365',name:'Bet365',color:'#F5A623',url:'https://www.bet365.com'},
+  {id:'betano',name:'Betano',color:'#00A651',url:'https://www.betano.com.br'},
+  {id:'betfair',name:'Betfair',color:'#F9690E',url:'https://www.betfair.com'},
+  {id:'sportingbet',name:'Sportingbet',color:'#003478',url:'https://www.sportingbet.com'},
+  {id:'betsul',name:'Betsul',color:'#E02020',url:'https://www.betsul.com'},
+  {id:'rivalo',name:'Rivalo',color:'#F5A623',url:'https://www.rivalo.com'},
+  {id:'stake',name:'Stake',color:'#00A86B',url:'https://stake.com'},
+  {id:'novibet',name:'Novibet',color:'#1A3A8F',url:'https://www.novibet.com.br'},
+  {id:'vbet',name:'Vbet',color:'#E02020',url:'https://www.vbet.com'},
+  {id:'bandbet',name:'BandBet',color:'#E02020',url:'https://www.bandbet.com.br'},
+  {id:'h2bet',name:'H2Bet',color:'#00A651',url:'https://www.h2bet.com.br'},
+  {id:'apostaganha',name:'Aposta Ganha',color:'#F5A623',url:'https://www.apostaganha.bet.br'},
+  {id:'betboo',name:'Betboo',color:'#003478',url:'https://www.betboo.com'},
+  {id:'superbet',name:'Superbet',color:'#E02020',url:'https://www.superbet.com.br'},
+  {id:'betsson',name:'Betsson',color:'#00A651',url:'https://www.betsson.com.br'},
+  {id:'galerabt',name:'Galera.bet',color:'#F5A623',url:'https://www.galera.bet'},
+  {id:'betnacional',name:'Betnacional',color:'#003478',url:'https://www.betnacional.com.br'},
+  {id:'kto',name:'KTO',color:'#00A86B',url:'https://www.kto.com'},
+  {id:'outro',name:'Outro',color:'#6B7280',url:''},
+];
+
+let DB=[];
+let S={loggedUser:null,viewingUser:null,perfil:'c',casaAtiva:'',gestaoC:'',casaOutro:''};
+
+function loadDB(){
+  const saved=localStorage.getItem('kt_db');
+  const defaults=[
+    {email:'kamaelcontatos@gmail.com',role:'Master',name:'Kamaelzinho'},
+    {email:'teste1@gmail.com',role:'Usuário',name:'Teste'},
+  ];
+  let passMap={};
+  try{passMap=JSON.parse(localStorage.getItem('kt_passes')||'{}')}catch(e){}
+  const base=saved?JSON.parse(saved):defaults;
+  DB=base.map(u=>({...u,pass:passMap[u.email]||'123456',data:u.data||new Date().toLocaleDateString('pt-BR')}));
+}
+function saveDB(){
+  localStorage.setItem('kt_db',JSON.stringify(DB.map(u=>{const{pass,...rest}=u;return rest})));
+  const pm={};DB.forEach(u=>pm[u.email]=u.pass);
+  localStorage.setItem('kt_passes',JSON.stringify(pm));
+}
+function dbFind(email){return DB.find(u=>u.email===email)}
+
+// Per-user data
+function getUD(email){
+  let all={};try{all=JSON.parse(localStorage.getItem('kt_udata')||'{}')}catch(e){}
+  if(!all[email])all[email]={bancaInicial:{},banca:{},registros:{},metas:[],transacoes:[],perfil:'c',casaAtiva:''};
+  return all[email];
+}
+function setUD(email,data){
+  let all={};try{all=JSON.parse(localStorage.getItem('kt_udata')||'{}')}catch(e){}
+  all[email]=data;localStorage.setItem('kt_udata',JSON.stringify(all));
+}
+function saveUD(){
+  const email=(S.viewingUser||S.loggedUser).email;
+  setUD(email,{
+    bancaInicial:S.bancaInicial,banca:S.banca,registros:S.registros,casaOutro:S.casaOutro||'',
+    metas:S.metas,transacoes:S.transacoes,perfil:S.perfil,casaAtiva:S.casaAtiva
+  });
+}
+function loadUD(email){
+  const d=getUD(email);
+  S.bancaInicial=d.bancaInicial||{};S.casaOutro=d.casaOutro||'';
+  S.banca=d.banca||{};
+  S.registros=d.registros||{};
+  S.metas=d.metas||[];
+  S.transacoes=d.transacoes||[];
+  S.perfil=d.perfil||'c';
+  S.casaAtiva=d.casaAtiva||'';
+  S.gestaoC=S.casaAtiva;
+}
+
+// ══════════════════════════════════════════════
+// AUTH
+// ══════════════════════════════════════════════
+function doLogin(){
+  loadDB();
+  const input=document.getElementById('l-email').value.trim();
+  const pass=document.getElementById('l-pass').value;
+  // find by email OR username
+  const u=DB.find(u=>u.email===input||u.username===input);
+  if(!u||u.pass!==pass){document.getElementById('l-err').style.display='block';return;}
+  S.loggedUser=u;S.viewingUser=null;
+  loadUD(u.email);
+  localStorage.setItem('kt_session',u.email);
+  startApp(u);
+}
+function startApp(u){
+  document.getElementById('login-screen').style.display='none';
+  const app=document.getElementById('app');
+  app.style.display='flex';
+  // setup user nav
+  const av=document.getElementById('side-avatar');
+  av.textContent=(u.name||u.email).substring(0,2).toUpperCase();
+  av.style.background=u.role==='Master'?'var(--gold)':u.role==='Admin'?'var(--blue)':'var(--teal)';
+  document.getElementById('side-email').textContent=u.name||u.email.split('@')[0];
+  document.getElementById('nav-admin').style.display=(u.role==='Master'||u.role==='Admin')?'flex':'none';
+  document.getElementById('viewing-banner').style.display='none';
+  buildCasaSelects();
+  selPrf(S.perfil);
+  setTimeout(initHomeDica,50);
+  goPage('home',document.getElementById('nav-home'));
+}
+function sair(){
+  localStorage.removeItem('kt_session');
+  document.getElementById('app').style.display='none';
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('l-pass').value='';
+}
+
+// Auto restore session
+window.onload=()=>{
+  loadDB();
+  const ses=localStorage.getItem('kt_session');
+  if(ses){const u=dbFind(ses);if(u){S.loggedUser=u;loadUD(ses);startApp(u);return;}}
+  const today=new Date().toISOString().split('T')[0];
+  const _le=document.getElementById('l-email');if(_le)_le.value='';
+  const _gd=document.getElementById('gr-data');if(_gd)_gd.value=today;
+  const _td=document.getElementById('tr-data');if(_td)_td.value=today;
+};
+
+
+
+// ── RESPONSIVE SIDEBAR ───────────────────────────────────────────────────────
+function toggleSidebar(){
+  const sb=document.getElementById('sidebar');
+  const ov=document.getElementById('sidebar-overlay');
+  const open=sb.classList.toggle('open');
+  ov.classList.toggle('open',open);
+}
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('open');
+}
+// Close sidebar when a nav item is clicked on mobile
+document.addEventListener('DOMContentLoaded',()=>{
+  document.querySelectorAll('.nav-item').forEach(el=>{
+    el.addEventListener('click',()=>{if(window.innerWidth<=640)closeSidebar();});
+  });
+});
+
+// ── HOME TABS ─────────────────────────────────────────────────────────────────
+const DICAS_DO_DIA=[
+  'Nunca aposte com dinheiro que você não pode perder. Sua banca deve ser um valor separado, exclusivo para apostas.',
+  'Respeite seu stop loss diário. Se atingiu o limite de perdas, pare. Amanhã é um novo dia.',
+  'Consistência supera intensidade. Apostas pequenas e controladas constroem patrimônio no longo prazo.',
+  'Evite "recuperar perdas" com apostas maiores. Isso é um dos maiores erros na gestão de banca.',
+  'Registre todas as suas apostas. Sem dados, não há análise. Sem análise, não há evolução.',
+  'Apostas por emoção são apostas perdidas. Decida com dados, não com intuição.',
+  'Um bom apostador sabe quando NÃO apostar. Nem todo dia tem oportunidade.',
+  'A gestão de banca protege você nos dias ruins e potencializa os dias bons.',
+  'Diversifique mercados e odds. Não concentre tudo em uma única aposta.',
+  'Disciplina hoje = banca saudável amanhã. Foque no processo, não no resultado isolado.',
+  'Odds muito altas têm menor probabilidade de acerto. Avalie o valor real de cada aposta.',
+  'Acompanhe seu ROI mensalmente. Ele diz mais sobre sua performance do que o lucro bruto.',
+];
+function setHomeTab(tab){
+  document.querySelectorAll('.home-info-tab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.home-info-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('htab-'+tab).classList.add('active');
+  // find matching tab button by onclick
+  document.querySelectorAll('.home-info-tab').forEach(b=>{if(b.getAttribute('onclick')&&b.getAttribute('onclick').includes("'"+tab+"'"))b.classList.add('active');});
+  if(tab==='dica'){
+    const idx=new Date().getDate()%DICAS_DO_DIA.length;
+    document.getElementById('dica-do-dia-text').textContent='"'+DICAS_DO_DIA[idx]+'"';
+  }
+}
+// init dica on page load
+function initHomeDica(){
+  const idx=new Date().getDate()%DICAS_DO_DIA.length;
+  const el=document.getElementById('dica-do-dia-text');
+  if(el)el.textContent='"'+DICAS_DO_DIA[idx]+'"';
+}
+
+// ══════════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════════
+function goPage(name,el){
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  if(el)el.classList.add('active');
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  if(name==='admin')renderAdmin();
+  if(name==='gestao')renderGestao();
+  if(name==='metas')renderMetas();
+  if(name==='transacoes')renderTransacoes();
+  if(name==='alavancagem')calcAlav();
+  if(name==='home')renderHome();
+}
+
+// ══════════════════════════════════════════════
+// VIEWING (admin manage-as)
+// ══════════════════════════════════════════════
+function gerenciarComo(email){
+  const u=dbFind(email);if(!u)return;
+  S.viewingUser=u;
+  loadUD(email);
+  document.getElementById('viewing-banner').style.display='flex';
+  document.getElementById('viewing-name').textContent=u.email;
+  buildCasaSelects();
+  selPrf(S.perfil);
+  setTimeout(initHomeDica,50);
+  goPage('gestao',document.getElementById('nav-gestao'));
+  closeM('m-adduser');
+}
+function voltarMinhaConta(){
+  S.viewingUser=null;
+  loadUD(S.loggedUser.email);
+  document.getElementById('viewing-banner').style.display='none';
+  buildCasaSelects();
+  selPrf(S.perfil);
+  setTimeout(initHomeDica,50);
+  goPage('home',document.getElementById('nav-home'));
+}
+
+// ══════════════════════════════════════════════
+// CASAS
+// ══════════════════════════════════════════════
+function buildCasaSelects(){
+  const sel=['home-casa-sel','gestao-casa-sel','tr-f-casa','tr-casa'];
+  sel.forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el)return;
+    el.innerHTML='';
+    // "Nenhuma" for home and gestao selects; "Todas" for filters
+    if(id==='tr-f-casa'){el.innerHTML='<option value="">Todas as casas</option>';}
+    else if(id==='home-casa-sel'||id==='gestao-casa-sel'){el.innerHTML='<option value="">— Nenhuma —</option>';}
+    else{el.innerHTML='<option value="">Selecione...</option>';}
+    CASAS.forEach(c=>{
+      const o=document.createElement('option');
+      o.value=c.id;o.textContent=c.name;
+      el.appendChild(o);
+    });
+    if(id==='home-casa-sel'){el.value=S.casaAtiva||'';toggleOutroField('home',S.casaAtiva);}
+    if(id==='gestao-casa-sel'){el.value=S.gestaoC||'';toggleOutroField('gestao',S.gestaoC);}
+  });
+  renderHome();
+}
+function toggleOutroField(prefix,val){
+  const wrap=document.getElementById(prefix+'-outro-wrap');
+  if(!wrap)return;
+  wrap.style.display=val==='outro'?'block':'none';
+  if(val==='outro'){
+    const inp=document.getElementById(prefix+'-outro-input');
+    if(inp)inp.value=S.casaOutro||'';
+  }
+}
+function setCasaOutroNome(v){
+  S.casaOutro=v;saveUD();renderHome();
+}
+function setGestaoOutroNome(v){
+  S.casaOutro=v;saveUD();
+}
+function setCasaAtiva(val){
+  S.casaAtiva=val;S.gestaoC=val;
+  toggleOutroField('home',val);
+  toggleOutroField('gestao',val);
+  saveUD();renderHome();
+  const gSel=document.getElementById('gestao-casa-sel');
+  if(gSel)gSel.value=val;
+  renderGestao();
+}
+function setGestaoC(val){
+  S.gestaoC=val;
+  toggleOutroField('gestao',val);
+  renderGestao();
+}
+function abrirLinkCasa(){
+  const c=CASAS.find(x=>x.id===S.casaAtiva);if(c&&c.url)window.open(c.url,'_blank');
+}
+function renderHome(){
+  const sel=document.getElementById('home-casa-sel');if(sel)sel.value=S.casaAtiva||'';
+  if(!S.casaAtiva){
+    document.getElementById('home-casa-ico').textContent='🏠';
+    document.getElementById('home-info-msg').innerHTML='<span style="color:var(--text2)">Selecione uma casa para começar</span>';
+    document.getElementById('home-link').style.display='none';
+    return;
+  }
+  const nomeExibido=S.casaAtiva==='outro'?(S.casaOutro||'Casa personalizada'):(CASAS.find(x=>x.id===S.casaAtiva)||{name:S.casaAtiva}).name;
+  document.getElementById('home-casa-ico').textContent='🏠';
+  document.getElementById('home-info-msg').innerHTML=`✅ Todas as abas já estão mostrando dados da <strong>${nomeExibido}</strong>`;
+  const c=CASAS.find(x=>x.id===S.casaAtiva);
+  if(c&&c.url){
+    document.getElementById('home-link').style.display='flex';
+    document.getElementById('home-link-text').textContent=c.url;
+  } else {
+    document.getElementById('home-link').style.display='none';
+  }
+}
+
+// ══════════════════════════════════════════════
+// ADMIN
+// ══════════════════════════════════════════════
+let selectedAdminUser=null;
+function renderAdmin(){
+  loadDB();
+  S.loggedUser.usuarios=DB;
+  const ul=document.getElementById('admin-user-list');
+  document.getElementById('admin-count').textContent=DB.length;
+  ul.innerHTML=DB.map(u=>`
+    <div class="admin-user-item${selectedAdminUser===u.email?' selected':''}" onclick="selectAdminUser('${u.email}')">
+      <div class="admin-avatar" style="background:${u.role==='Master'?'var(--gold)':u.role==='Admin'?'var(--blue)':'var(--teal)'}">
+        ${(u.name||u.email).substring(0,2).toUpperCase()}
+      </div>
+      <div style="flex:1;overflow:hidden">
+        <div style="font-size:13.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${u.email}</div>
+        <div style="font-size:11px;color:var(--text2)">${u.data||''}</div>
+      </div>
+      <span class="badge ${u.role==='Master'?'badge-gold':u.role==='Admin'?'badge-blue':'badge-teal'}">${u.role}</span>
+    </div>`).join('');
+  if(selectedAdminUser)selectAdminUser(selectedAdminUser);
+}
+function selectAdminUser(email){
+  selectedAdminUser=email;
+  const u=dbFind(email);if(!u)return;
+  document.querySelectorAll('.admin-user-item').forEach(el=>{
+    el.classList.toggle('selected',el.querySelector('.admin-avatar')&&el.textContent.includes(u.email.split('@')[0].substring(0,1).toUpperCase()));
+  });
+  // re-render list to show selection
+  const ul=document.getElementById('admin-user-list');
+  ul.querySelectorAll('.admin-user-item').forEach(el=>{
+    el.classList.toggle('selected',el.textContent.includes(email.substring(0,6)));
+  });
+  const det=document.getElementById('admin-detail');
+  det.innerHTML=`
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
+      <div class="admin-avatar" style="width:46px;height:46px;font-size:17px;background:${u.role==='Master'?'var(--gold)':u.role==='Admin'?'var(--blue)':'var(--teal)'}">
+        ${(u.name||u.email).substring(0,2).toUpperCase()}
+      </div>
+      <div>
+        <div style="font-size:15px;font-weight:700">${u.email}</div>
+        <div style="font-size:12px;color:var(--text2)">Cadastrado em ${u.data||'-'}</div>
+      </div>
+    </div>
+    <div class="detail-field"><span class="detail-label">Tipo de conta</span><span class="badge ${u.role==='Master'?'badge-gold':u.role==='Admin'?'badge-blue':'badge-teal'}">${u.role}</span></div>
+    <div class="detail-field"><span class="detail-label">Email</span><span class="detail-val">${u.email}</span></div>
+    <div class="detail-field"><span class="detail-label">Data de cadastro</span><span class="detail-val">${u.data||'-'}</span></div>
+    <div class="detail-actions">
+      <button class="btn btn-primary" style="justify-content:center" onclick="gerenciarComo('${u.email}')">⚙️ Gerenciar</button>
+      <button class="btn btn-outline" style="justify-content:center" onclick="editarTipo('${u.email}')">✏️ Editar</button>
+      <button class="btn btn-outline" style="justify-content:center" onclick="abrirSenha('${u.email}')">🔑 Senha</button>
+      ${u.role!=='Master'?`<button class="btn btn-danger" style="justify-content:center" onclick="delUser('${u.email}')">🗑 Remover</button>`:'<div></div>'}
+    </div>`;
+}
+function editarTipo(email){
+  const u=dbFind(email);if(!u)return;
+  const novo=prompt(`Tipo atual: ${u.role}\nDigite o novo tipo (Usuário, Admin):`,u.role);
+  if(novo&&['Usuário','Admin'].includes(novo)&&u.role!=='Master'){u.role=novo;saveDB();renderAdmin();showToast('Tipo atualizado!');}
+}
+function abrirSenha(email){
+  S._senhaTarget=email;
+  document.getElementById('senha-email-info').textContent='Alterando senha de: '+email;
+  document.getElementById('s-nova').value='';document.getElementById('s-conf').value='';
+  openM('m-senha');
+}
+function checkPassReqs(val,prefix){
+  const reqs={
+    [prefix+'-len']:val.length>=8,
+    [prefix+'-upper']:/[A-Z]/.test(val),
+    [prefix+'-special']:/[!@#$%^&*()_+\-=\[\]{};':"\|,.<>\/?]/.test(val)
+  };
+  Object.entries(reqs).forEach(([id,met])=>{
+    const el=document.getElementById(id);
+    if(el)el.classList.toggle('met',met);
+  });
+  return Object.values(reqs).every(Boolean);
+}
+function isStrongPass(val){
+  return val.length>=8&&/[A-Z]/.test(val)&&/[!@#$%^&*()_+\-=\[\]{};':"\|,.<>\/?]/.test(val);
+}
+function salvarSenha(){
+  const nova=document.getElementById('s-nova').value;
+  const conf=document.getElementById('s-conf').value;
+  if(!isStrongPass(nova)){showToast('A senha não atende os requisitos');return;}
+  if(nova!==conf){showToast('Senhas não conferem');return;}
+  const u=dbFind(S._senhaTarget);if(u){u.pass=nova;saveDB();closeM('m-senha');showToast('Senha alterada!');}
+}
+function switchLoginTab(tab){
+  document.getElementById('form-login').style.display=tab==='login'?'':'none';
+  document.getElementById('form-register').style.display=tab==='register'?'':'none';
+  document.getElementById('tab-login').classList.toggle('active',tab==='login');
+  document.getElementById('tab-register').classList.toggle('active',tab==='register');
+}
+function maskTel(input){
+  let v=input.value.replace(/\D/g,'').substring(0,11);
+  if(v.length>6)v=`(${v.substring(0,2)}) ${v.substring(2,7)}-${v.substring(7)}`;
+  else if(v.length>2)v=`(${v.substring(0,2)}) ${v.substring(2)}`;
+  else if(v.length)v=`(${v}`;
+  input.value=v;
+}
+function doRegister(){
+  const nome=document.getElementById('r-nome').value.trim();
+  const tel=document.getElementById('r-tel').value.trim();
+  const email=document.getElementById('r-email').value.trim();
+  const user=document.getElementById('r-user').value.trim();
+  const pass=document.getElementById('r-pass').value;
+  const conf=document.getElementById('r-conf').value;
+  const errEl=document.getElementById('r-err');
+  errEl.style.display='none';
+  if(!nome||!email||!user||!pass){errEl.textContent='Preencha todos os campos obrigatórios';errEl.style.display='block';return;}
+  if(!isStrongPass(pass)){errEl.textContent='A senha não atende os requisitos de segurança';errEl.style.display='block';return;}
+  if(pass!==conf){errEl.textContent='As senhas não conferem';errEl.style.display='block';return;}
+  loadDB();
+  if(dbFind(email)){errEl.textContent='Este email já está cadastrado';errEl.style.display='block';return;}
+  DB.push({email,role:'Usuário',name:nome,username:user,tel,pass,data:new Date().toLocaleDateString('pt-BR')});
+  saveDB();
+  showToast('Conta criada! Faça login. 🎉');
+  // clear form
+  ['r-nome','r-tel','r-email','r-user','r-pass','r-conf'].forEach(id=>document.getElementById(id).value='');
+  switchLoginTab('login');
+  document.getElementById('l-email').value=email;
+}
+function delUser(email){
+  if(email===S.loggedUser.email){showToast('Não pode remover a si mesmo');return;}
+  if(!confirm('Remover usuário '+email+'?'))return;
+  DB=DB.filter(u=>u.email!==email);saveDB();selectedAdminUser=null;
+  document.getElementById('admin-detail').innerHTML='<div class="empty-state"><div class="empty-icon">👤</div><div class="empty-text">Selecione um usuário</div></div>';
+  renderAdmin();showToast('Usuário removido');
+}
+function addUser(){
+  const email=document.getElementById('au-email').value.trim();
+  const tipo=document.getElementById('au-tipo').value;
+  const pass=document.getElementById('au-pass').value;
+  if(!email||!pass){showToast('Preencha todos os campos');return;}
+  if(dbFind(email)){showToast('Email já cadastrado');return;}
+  DB.push({email,role:tipo,name:'',pass,data:new Date().toLocaleDateString('pt-BR')});
+  saveDB();closeM('m-adduser');renderAdmin();showToast('Usuário criado!');
+}
+
+// ══════════════════════════════════════════════
+// ALAVANCAGEM
+// ══════════════════════════════════════════════
+function calcAlav(){
+  const banca=parseFloat(document.getElementById('al-banca').value)||100;
+  const meta=parseFloat(document.getElementById('al-meta').value)||10;
+  const n=parseInt(document.getElementById('al-entradas').value)||10;
+  document.getElementById('alav-title').textContent=`Tabela de Alavancagem — ${n} Entradas (${meta}% por aposta)`;
+  document.getElementById('alav-meta-col').textContent=`Meta ${meta}%`;
+  const body=document.getElementById('alav-body');
+  let rows='';let b=banca;
+  for(let i=1;i<=n;i++){
+    const ganho=b*(meta/100);const depois=b+ganho;
+    rows+=`<tr><td>${i}</td><td>${b.toFixed(2)}</td><td style="color:var(--teal);font-weight:600">${ganho.toFixed(2)}</td><td style="color:var(--teal);font-weight:700">${depois.toFixed(2)}</td></tr>`;
+    b=depois;
+  }
+  body.innerHTML=rows;
+  const lucroTotal=b-banca;const pct=((b/banca-1)*100).toFixed(0);
+  document.getElementById('alav-summary').innerHTML=`
+    <div class="stat-card"><div class="stat-label">Resultado Final</div><div class="stat-val teal" style="font-size:24px">R$ ${b.toFixed(2)}</div></div>
+    <div class="stat-card"><div class="stat-label">Lucro</div><div class="stat-val green">+${pct}%<div style="font-size:14px;margin-top:2px">+R$ ${lucroTotal.toFixed(2)}</div></div></div>
+    <div class="stat-card"><div class="stat-label">Total de Entradas</div><div class="stat-val" style="font-size:28px">${n}</div></div>`;
+}
+
+// ══════════════════════════════════════════════
+// CALCULADORA
+// ══════════════════════════════════════════════
+function setPct(v){document.getElementById('calc-pct').value=v;calcStake();}
+function calcStake(){
+  const banca=parseFloat(document.getElementById('calc-banca').value)||0;
+  const pct=parseFloat(document.getElementById('calc-pct').value)||0;
+  const stake=banca*(pct/100);
+  const el=document.getElementById('calc-result');
+  if(banca>0&&pct>0){el.style.display='block';document.getElementById('calc-stake-val').textContent=fmtBRL(stake);}
+  else el.style.display='none';
+}
+function simularCrescimento(){
+  const b=parseFloat(document.getElementById('sim-banca').value)||100;
+  const meta=parseFloat(document.getElementById('sim-meta').value)||5;
+  const dias=parseInt(document.getElementById('sim-dias').value)||10;
+  let final=b;
+  for(let i=0;i<dias;i++)final*=(1+meta/100);
+  const lucro=((final/b-1)*100).toFixed(0);
+  document.getElementById('sim-result').style.display='block';
+  document.getElementById('sim-final').textContent=fmtBRL(final);
+  document.getElementById('sim-lucro').textContent=`+${lucro}%`;
+  document.getElementById('sim-lucro-brl').textContent=`+${fmtBRL(final-b)}`;
+}
+
+// ══════════════════════════════════════════════
+// GESTÃO DE BANCA
+// ══════════════════════════════════════════════
+function selPrf(p){
+  S.perfil=p;
+  ['c','m','a'].forEach(x=>{
+    const el=document.getElementById('prf-'+x);if(!el)return;
+    if(x==='c'){el.style.borderColor=p==='c'?'var(--green)':'var(--border)';el.style.background=p==='c'?'var(--green-bg)':'var(--white)';}
+    if(x==='m'){el.style.borderColor=p==='m'?'var(--gold)':'var(--border)';el.style.background=p==='m'?'var(--gold-bg)':'var(--white)';}
+    if(x==='a'){el.style.borderColor=p==='a'?'var(--red)':'var(--border)';el.style.background=p==='a'?'var(--red-bg)':'var(--white)';}
+  });
+  saveUD();
+}
+function editarBancaInicial(){
+  const c=S.gestaoC;
+  document.getElementById('bi-val').value=S.bancaInicial[c]||0;
+  openM('m-banca-ini');
+}
+function salvarBancaInicial(){
+  const val=parseFloat(document.getElementById('bi-val').value)||0;
+  S.bancaInicial[S.gestaoC]=val;
+  if(!S.banca[S.gestaoC])S.banca[S.gestaoC]=val;
+  saveUD();closeM('m-banca-ini');renderGestao();showToast('Banca inicial salva!');
+}
+// ── GESTÃO INLINE ─────────────────────────────────────────────────────────────
+// Registros structure: {id, data, inicial, deposito, saque, resultado, final}
+
+function getUltimoFinal(c){
+  const regs=S.registros[c]||[];
+  if(!regs.length) return S.bancaInicial[c]||0;
+  // last saved row's final
+  return parseFloat(regs[regs.length-1].final)||0;
+}
+function calcFinalInline(ini,dep,saq,res){
+  return parseFloat((ini + dep - saq + res).toFixed(2));
+}
+
+function adicionarLinhaGestao(){
+  const c=S.gestaoC;
+  if(!c){showToast('Selecione uma casa primeiro');return;}
+  // Don't add if there's already an unsaved row
+  if(document.querySelector('.row-new')){showToast('Salve a linha atual antes de adicionar outra');return;}
+  const today=new Date().toISOString().split('T')[0];
+  const ini=getUltimoFinal(c);
+  const tempId='new_'+Date.now();
+  const body=document.getElementById('gestao-body');
+  // Remove empty state row
+  const emptyRow=body.querySelector('td[colspan]');
+  if(emptyRow)emptyRow.parentElement.remove();
+  const tr=document.createElement('tr');
+  tr.className='row-new';
+  tr.dataset.tempId=tempId;
+  tr.innerHTML=`
+    <td><input class="row-input" type="date" value="${today}" id="ri-data-${tempId}"></td>
+    <td><input class="row-input" type="number" step="0.01" value="${ini.toFixed(2)}" id="ri-ini-${tempId}" oninput="calcFinalRow('${tempId}')"></td>
+    <td><input class="row-input" type="number" step="0.01" value="0" id="ri-dep-${tempId}" oninput="calcFinalRow('${tempId}')"></td>
+    <td><input class="row-input" type="number" step="0.01" value="0" id="ri-saq-${tempId}" oninput="calcFinalRow('${tempId}')"></td>
+    <td><input class="row-input" type="number" step="0.01" value="0" placeholder="0,00" id="ri-res-${tempId}" oninput="calcFinalRow('${tempId}')"></td>
+    <td><span id="ri-pct-${tempId}" style="font-size:13px;font-weight:700;color:var(--text2);padding:0 6px">0.00%</span></td>
+    <td><input class="row-input" type="number" step="0.01" value="${ini.toFixed(2)}" id="ri-fin-${tempId}" style="font-weight:700;color:var(--teal)"></td>
+    <td><div style="display:flex;gap:5px">
+      <button class="btn-icon btn" style="color:var(--teal);border-color:var(--teal)" onclick="salvarLinhaGestao('${tempId}')" title="Salvar">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+      </button>
+      <button class="btn-icon btn" style="color:var(--red-text)" onclick="this.closest('tr').remove();renderGestao()" title="Cancelar">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div></td>`;
+  body.appendChild(tr);
+  tr.querySelector('input[type="date"]').focus();
+}
+
+function calcFinalRow(tempId){
+  const ini=parseFloat(document.getElementById('ri-ini-'+tempId)?.value)||0;
+  const dep=parseFloat(document.getElementById('ri-dep-'+tempId)?.value)||0;
+  const saq=parseFloat(document.getElementById('ri-saq-'+tempId)?.value)||0;
+  const res=parseFloat(document.getElementById('ri-res-'+tempId)?.value)||0;
+  const fin=calcFinalInline(ini,dep,saq,res);
+  const finEl=document.getElementById('ri-fin-'+tempId);
+  if(finEl)finEl.value=fin.toFixed(2);
+  const pctEl=document.getElementById('ri-pct-'+tempId);
+  if(pctEl&&ini){const pct=(res/ini*100);pctEl.textContent=(pct>=0?'+':'')+pct.toFixed(2)+'%';pctEl.style.color=pct>0?'var(--green-text)':pct<0?'var(--red-text)':'var(--text2)';}
+}
+
+function salvarLinhaGestao(tempId){
+  const c=S.gestaoC;
+  if(!S.registros[c])S.registros[c]=[];
+  const data=document.getElementById('ri-data-'+tempId)?.value||'';
+  const ini=parseFloat(document.getElementById('ri-ini-'+tempId)?.value)||0;
+  const dep=parseFloat(document.getElementById('ri-dep-'+tempId)?.value)||0;
+  const saq=parseFloat(document.getElementById('ri-saq-'+tempId)?.value)||0;
+  const res=parseFloat(document.getElementById('ri-res-'+tempId)?.value)||0;
+  const fin=parseFloat(document.getElementById('ri-fin-'+tempId)?.value)||calcFinalInline(ini,dep,saq,res);
+  if(!data){showToast('Informe a data');return;}
+  const r={id:Date.now(),data,inicial:ini,deposito:dep,saque:saq,resultado:res,final:fin};
+  S.registros[c].push(r);
+  // update banca
+  S.banca[c]=fin;
+  saveUD();renderGestao();showToast('Linha salva! ✅');
+}
+
+function salvarEdicaoGestao(id){
+  const c=S.gestaoC;
+  const regs=S.registros[c]||[];
+  const idx=regs.findIndex(x=>x.id===id);if(idx<0)return;
+  const data=document.getElementById('re-data-'+id)?.value||regs[idx].data;
+  const ini=parseFloat(document.getElementById('re-ini-'+id)?.value)||0;
+  const dep=parseFloat(document.getElementById('re-dep-'+id)?.value)||0;
+  const saq=parseFloat(document.getElementById('re-saq-'+id)?.value)||0;
+  const res=parseFloat(document.getElementById('re-res-'+id)?.value)||0;
+  const fin=parseFloat(document.getElementById('re-fin-'+id)?.value)||calcFinalInline(ini,dep,saq,res);
+  regs[idx]={...regs[idx],data,inicial:ini,deposito:dep,saque:saq,resultado:res,final:fin};
+  // recalculate banca from scratch
+  recalcBanca(c);
+  saveUD();renderGestao();showToast('Linha atualizada! ✅');
+}
+
+function recalcBanca(c){
+  const regs=S.registros[c]||[];
+  if(!regs.length){S.banca[c]=S.bancaInicial[c]||0;return;}
+  S.banca[c]=regs[regs.length-1].final||0;
+}
+
+function delGestaoReg(id){
+  const c=S.gestaoC;
+  S.registros[c]=(S.registros[c]||[]).filter(x=>x.id!==id);
+  recalcBanca(c);
+  saveUD();renderGestao();showToast('Registro removido');
+}
+
+function calcFinalEditRow(id){
+  const ini=parseFloat(document.getElementById('re-ini-'+id)?.value)||0;
+  const dep=parseFloat(document.getElementById('re-dep-'+id)?.value)||0;
+  const saq=parseFloat(document.getElementById('re-saq-'+id)?.value)||0;
+  const res=parseFloat(document.getElementById('re-res-'+id)?.value)||0;
+  const fin=calcFinalInline(ini,dep,saq,res);
+  const finEl=document.getElementById('re-fin-'+id);
+  if(finEl)finEl.value=fin.toFixed(2);
+  const pctEl=document.getElementById('re-pct-'+id);
+  if(pctEl&&ini){const pct=(res/ini*100);pctEl.textContent=(pct>=0?'+':'')+pct.toFixed(2)+'%';pctEl.style.color=pct>0?'var(--green-text)':pct<0?'var(--red-text)':'var(--text2)';}
+}
+
+function renderGestao(){
+  const c=S.gestaoC;
+  const sel=document.getElementById('gestao-casa-sel');if(sel)sel.value=c||'';
+  document.getElementById('g-banca-ini').textContent=fmtBRL(S.bancaInicial[c]||0);
+  document.getElementById('g-banca-atual').textContent=fmtBRL(S.banca[c]||0);
+  const regs=S.registros[c]||[];
+  const body=document.getElementById('gestao-body');
+  if(!regs.length){
+    body.innerHTML=`<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--text2)">Nenhum registro. Clique em "+ Adicionar linha" para começar.</td></tr>`;
+    return;
+  }
+  body.innerHTML=regs.map((r,i)=>{
+    const resColor=r.resultado>0?'var(--green-text)':r.resultado<0?'var(--red-text)':'var(--text2)';
+    const finColor=r.final>=(S.bancaInicial[c]||0)?'var(--teal)':'var(--red-text)';
+    return`<tr class="row-saved">
+      <td><input class="row-input" type="date" value="${r.data||''}" id="re-data-${r.id}" onchange="salvarEdicaoGestao(${r.id})"></td>
+      <td><input class="row-input" type="number" step="0.01" value="${(r.inicial||0).toFixed(2)}" id="re-ini-${r.id}" oninput="calcFinalEditRow(${r.id})"></td>
+      <td><input class="row-input" type="number" step="0.01" value="${(r.deposito||0).toFixed(2)}" id="re-dep-${r.id}" oninput="calcFinalEditRow(${r.id})" style="color:var(--green-text)"></td>
+      <td><input class="row-input" type="number" step="0.01" value="${(r.saque||0).toFixed(2)}" id="re-saq-${r.id}" oninput="calcFinalEditRow(${r.id})" style="color:var(--red-text)"></td>
+      <td><input class="row-input" type="number" step="0.01" value="${(r.resultado||0).toFixed(2)}" id="re-res-${r.id}" oninput="calcFinalEditRow(${r.id})" style="color:${resColor}"></td>
+      <td><span id="re-pct-${r.id}" style="font-size:13px;font-weight:700;padding:0 6px;color:${r.inicial?((r.resultado||0)>0?'var(--green-text)':(r.resultado||0)<0?'var(--red-text)':'var(--text2)'):'var(--text2)'}">${r.inicial?((r.resultado||0)>=0?'+':'')+((r.resultado||0)/r.inicial*100).toFixed(2)+'%':'—'}</span></td>
+      <td><input class="row-input" type="number" step="0.01" value="${(r.final||0).toFixed(2)}" id="re-fin-${r.id}" style="font-weight:700;color:${finColor}"></td>
+      <td><div style="display:flex;gap:5px">
+        <button class="btn-icon btn" style="color:var(--teal);border-color:var(--teal)" onclick="salvarEdicaoGestao(${r.id})" title="Salvar">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        </button>
+        <button class="btn-icon btn" style="color:var(--red-text)" onclick="delGestaoReg(${r.id})" title="Remover">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6m4-6v6"/></svg>
+        </button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════
+// METAS
+// ══════════════════════════════════════════════
+function selIco(btn,ico){
+  document.querySelectorAll('#mt-ico-grid .ico-btn').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');document.getElementById('mt-ico').value=ico;
+}
+function selIcoEdit(btn,ico){
+  document.querySelectorAll('#em-ico-grid .ico-btn').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');document.getElementById('em-ico').value=ico;
+}
+function setMetaTab(t){
+  ['info','aporte','hist'].forEach(x=>{
+    document.getElementById('em-'+x).style.display=x===t?'':'none';
+    document.getElementById('em-tab-'+x).classList.toggle('active',x===t);
+  });
+  if(t==='aporte')renderAporteInfo();
+  if(t==='hist')renderMetaHist();
+}
+function addMeta(){
+  const titulo=document.getElementById('mt-titulo').value.trim();
+  if(!titulo){showToast('Digite o nome da meta');return;}
+  const now=new Date().toLocaleString('pt-BR');
+  S.metas.push({
+    id:Date.now(),titulo,
+    icone:document.getElementById('mt-ico').value||'🎯',
+    alvo:parseFloat(document.getElementById('mt-alvo').value)||1000,
+    atual:parseFloat(document.getElementById('mt-atual').value)||0,
+    prazo:document.getElementById('mt-prazo').value||'',
+    concluida:false,
+    historico:[{tipo:'criacao',desc:'Meta criada',data:now,valor:0}]
+  });
+  document.getElementById('mt-titulo').value='';document.getElementById('mt-alvo').value='';document.getElementById('mt-atual').value='0';
+  saveUD();closeM('m-meta');renderMetas();showToast('Meta criada! 🎯');
+}
+let editMetaId=null;
+function abrirEditMeta(id){
+  const m=S.metas.find(x=>x.id===id);if(!m)return;
+  editMetaId=id;
+  document.getElementById('em-titulo').value=m.titulo;
+  document.getElementById('em-alvo').value=m.alvo;
+  document.getElementById('em-atual').value=m.atual||0;
+  document.getElementById('em-prazo').value=m.prazo||'';
+  document.getElementById('em-ico').value=m.icone||'🎯';
+  document.querySelectorAll('#em-ico-grid .ico-btn').forEach(b=>b.classList.toggle('sel',b.textContent.trim()===(m.icone||'🎯')));
+  document.getElementById('em-aporte-val').value='';document.getElementById('em-aporte-desc').value='';
+  setMetaTab('info');openM('m-edit-meta');
+}
+function salvarEditMeta(){
+  const m=S.metas.find(x=>x.id===editMetaId);if(!m)return;
+  const novoAtual=parseFloat(document.getElementById('em-atual').value)||0;
+  if(novoAtual!==m.atual){
+    m.historico=m.historico||[];
+    m.historico.push({tipo:'edicao',desc:'Valor atual alterado manualmente',data:new Date().toLocaleString('pt-BR'),valor:novoAtual-m.atual});
+    m.atual=novoAtual;
+  }
+  m.titulo=document.getElementById('em-titulo').value.trim()||m.titulo;
+  m.icone=document.getElementById('em-ico').value||m.icone;
+  m.alvo=parseFloat(document.getElementById('em-alvo').value)||m.alvo;
+  m.prazo=document.getElementById('em-prazo').value||m.prazo;
+  saveUD();closeM('m-edit-meta');renderMetas();showToast('Meta atualizada! ✅');
+}
+function renderAporteInfo(){
+  const m=S.metas.find(x=>x.id===editMetaId);if(!m)return;
+  document.getElementById('em-ap-atual').textContent=fmtBRL(m.atual||0);
+  document.getElementById('em-ap-falta').textContent=fmtBRL(Math.max(0,(m.alvo||0)-(m.atual||0)));
+}
+function fazerAporte(){
+  const m=S.metas.find(x=>x.id===editMetaId);if(!m)return;
+  const val=parseFloat(document.getElementById('em-aporte-val').value)||0;
+  if(val<=0){showToast('Digite um valor válido');return;}
+  const desc=document.getElementById('em-aporte-desc').value.trim()||'Aporte realizado';
+  const now=new Date().toLocaleString('pt-BR');
+  m.atual=(m.atual||0)+val;
+  m.historico=m.historico||[];
+  m.historico.push({tipo:'aporte',desc,data:now,valor:val});
+  if(m.atual>=m.alvo&&!m.concluida){
+    m.concluida=true;
+    m.historico.push({tipo:'conclusao',desc:'Meta atingida automaticamente!',data:now,valor:0});
+    showToast('🎉 Meta concluída!');
+  }
+  document.getElementById('em-aporte-val').value='';document.getElementById('em-aporte-desc').value='';
+  saveUD();renderAporteInfo();renderMetaHist();renderMetas();
+}
+function renderMetaHist(){
+  const m=S.metas.find(x=>x.id===editMetaId);
+  const list=document.getElementById('em-hist-list');
+  if(!m||!m.historico||!m.historico.length){list.innerHTML='<div class="empty-state">Nenhuma ação registrada</div>';return;}
+  list.innerHTML=[...m.historico].reverse().map(h=>`
+    <div class="hist-item">
+      <div style="font-size:20px">${h.tipo==='aporte'?'💸':h.tipo==='conclusao'?'🏆':h.tipo==='edicao'?'✏️':'🎯'}</div>
+      <div style="flex:1"><div style="font-size:13px;font-weight:600">${h.desc}</div><div style="font-size:11px;color:var(--text2)">${h.data}</div></div>
+      ${h.valor?`<div style="font-weight:700;color:var(--green-text);font-size:13px">+${fmtBRL(h.valor)}</div>`:''}
+    </div>`).join('');
+}
+function concMeta(id){
+  const m=S.metas.find(x=>x.id===id);if(!m)return;
+  m.concluida=true;m.historico=m.historico||[];
+  m.historico.push({tipo:'conclusao',desc:'Meta marcada como concluída',data:new Date().toLocaleString('pt-BR'),valor:0});
+  saveUD();renderMetas();showToast('Meta concluída! 🎉');
+}
+function delMeta(id){S.metas=S.metas.filter(x=>x.id!==id);saveUD();renderMetas();showToast('Meta removida');}
+function renderMetas(){
+  document.getElementById('mt-ativas').textContent=S.metas.filter(m=>!m.concluida).length;
+  document.getElementById('mt-conc').textContent=S.metas.filter(m=>m.concluida).length;
+  const list=document.getElementById('mt-list');
+  if(!S.metas.length){list.innerHTML='<div class="card empty-state"><div class="empty-icon">🎯</div><div class="empty-text">Nenhuma meta criada ainda</div></div>';return;}
+  list.innerHTML=S.metas.map(m=>{
+    const atual=m.atual||0;const prog=Math.min(100,(atual/m.alvo)*100);const falta=Math.max(0,m.alvo-atual);
+    return`<div class="meta-card" style="opacity:${m.concluida?0.7:1}">
+      <div class="meta-card-top">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:36px;height:36px;background:var(--teal-light);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px">${m.icone||'🎯'}</div>
+          <div><div class="meta-card-name">${m.titulo} ${m.concluida?'✅':''}</div><div class="meta-card-prazo">${m.prazo?'📅 '+m.prazo:'Sem prazo'}</div></div>
+        </div>
+        <div class="meta-actions">
+          ${!m.concluida?`
+          <button class="meta-action-btn" title="Aporte" onclick="abrirEditMeta(${m.id});setTimeout(()=>setMetaTab('aporte'),100)">💸</button>
+          <button class="meta-action-btn" title="Histórico" onclick="abrirEditMeta(${m.id});setTimeout(()=>setMetaTab('hist'),100)">🕐</button>
+          <button class="meta-action-btn" title="Editar" onclick="abrirEditMeta(${m.id})">✏️</button>
+          <button class="meta-action-btn" title="Concluir" onclick="concMeta(${m.id})" style="color:var(--teal);border-color:var(--teal)">✓</button>
+          <button class="meta-action-btn" title="Remover" onclick="delMeta(${m.id})" style="color:var(--red-text)">🗑</button>`:`
+          <button class="meta-action-btn" title="Histórico" onclick="abrirEditMeta(${m.id});setTimeout(()=>setMetaTab('hist'),100)">📋</button>
+          <button class="meta-action-btn" title="Remover" onclick="delMeta(${m.id})" style="color:var(--red-text)">🗑</button>`}
+        </div>
+      </div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:4px">${fmtBRL(atual)} / ${fmtBRL(m.alvo)}</div>
+      <div class="progress-wrap"><div class="progress-bar" style="width:${prog}%"></div></div>
+      <div class="meta-card-pct">${prog.toFixed(1)}% concluído${!m.concluida?` &nbsp;•&nbsp; Falta: <span style="color:var(--teal);font-weight:600">${fmtBRL(falta)}</span>`:''}</div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════
+// TRANSAÇÕES
+// ══════════════════════════════════════════════
+let editTransId=null;
+function populateTransCasas(){
+  const sel=document.getElementById('tr-casa');if(!sel)return;
+  sel.innerHTML='<option value="">Selecione...</option>';
+  CASAS.forEach(c=>{const o=document.createElement('option');o.value=c.id;o.textContent=c.name;sel.appendChild(o);});
+  const fsel=document.getElementById('tr-f-casa');if(!fsel)return;
+  fsel.innerHTML='<option value="">Todas as casas</option>';
+  CASAS.forEach(c=>{const o=document.createElement('option');o.value=c.id;o.textContent=c.name;fsel.appendChild(o);});
+}
+function openTransModal(){
+  editTransId=null;
+  document.getElementById('trans-modal-title').textContent='Nova Transação';
+  document.getElementById('trans-save-btn').textContent='Registrar';
+  document.getElementById('trans-save-btn').onclick=salvarTrans;
+  const today=new Date().toISOString().split('T')[0];
+  document.getElementById('tr-data').value=today;
+  document.getElementById('tr-tipo').value='Depósito';
+  document.getElementById('tr-valor').value='';
+  document.getElementById('tr-casa').value='';
+  document.getElementById('tr-metodo').value='';
+  document.getElementById('tr-status').value='Concluído';
+  document.getElementById('tr-obs').value='';
+  populateTransCasas();
+  openM('m-trans');
+}
+// override the button
+document.addEventListener('DOMContentLoaded',()=>{
+  document.querySelector('[onclick="openM(\'m-trans\')"]')&&(document.querySelector('[onclick="openM(\'m-trans\')"]').onclick=openTransModal);
+});
+function salvarTrans(){
+  const val=parseFloat(document.getElementById('tr-valor').value)||0;
+  if(!val){showToast('Digite o valor');return;}
+  const casa=document.getElementById('tr-casa').value;
+  if(!casa){showToast('Selecione a casa');return;}
+  const t={
+    id:editTransId||Date.now(),
+    data:document.getElementById('tr-data').value,
+    tipo:document.getElementById('tr-tipo').value,
+    valor:val,casa,
+    metodo:document.getElementById('tr-metodo').value,
+    status:document.getElementById('tr-status').value,
+    obs:document.getElementById('tr-obs').value
+  };
+  if(editTransId){S.transacoes=S.transacoes.map(x=>x.id===editTransId?t:x);}
+  else S.transacoes.unshift(t);
+  saveUD();closeM('m-trans');renderTransacoes();showToast(editTransId?'Transação atualizada!':'Transação registrada!');
+}
+function editTrans(id){
+  const t=S.transacoes.find(x=>x.id===id);if(!t)return;
+  editTransId=id;
+  document.getElementById('trans-modal-title').textContent='Editar Transação';
+  document.getElementById('trans-save-btn').textContent='Salvar';
+  document.getElementById('trans-save-btn').onclick=salvarTrans;
+  populateTransCasas();
+  document.getElementById('tr-data').value=t.data||'';
+  document.getElementById('tr-tipo').value=t.tipo||'Depósito';
+  document.getElementById('tr-valor').value=t.valor||'';
+  document.getElementById('tr-casa').value=t.casa||'';
+  document.getElementById('tr-metodo').value=t.metodo||'';
+  document.getElementById('tr-status').value=t.status||'Concluído';
+  document.getElementById('tr-obs').value=t.obs||'';
+  openM('m-trans');
+}
+function delTrans(id){S.transacoes=S.transacoes.filter(x=>x.id!==id);saveUD();renderTransacoes();showToast('Transação removida');}
+function renderTransacoes(){
+  const fCasa=document.getElementById('tr-f-casa')?.value||'';
+  const fTipo=document.getElementById('tr-f-tipo')?.value||'';
+  const fMetodo=document.getElementById('tr-f-metodo')?.value||'';
+  const fStatus=document.getElementById('tr-f-status')?.value||'';
+  let list=S.transacoes.filter(t=>
+    (!fCasa||t.casa===fCasa)&&
+    (!fTipo||t.tipo===fTipo)&&
+    (!fMetodo||t.metodo===fMetodo)&&
+    (!fStatus||t.status===fStatus)
+  );
+  const totalDep=S.transacoes.filter(t=>t.tipo==='Depósito'&&t.status==='Concluído').reduce((s,t)=>s+t.valor,0);
+  const totalSaq=S.transacoes.filter(t=>t.tipo==='Saque'&&t.status==='Concluído').reduce((s,t)=>s+t.valor,0);
+  const pend=S.transacoes.filter(t=>t.status==='Pendente').length;
+  document.getElementById('tr-dep').textContent=fmtBRL(totalDep);
+  document.getElementById('tr-saq').textContent=fmtBRL(totalSaq);
+  document.getElementById('tr-saldo').textContent=fmtBRL(totalDep-totalSaq);
+  document.getElementById('tr-pend').textContent=pend;
+  const body=document.getElementById('trans-body');
+  if(!list.length){body.innerHTML=`<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--text2)">Nenhuma transação registrada ainda.</td></tr>`;return;}
+  const casaMap={};CASAS.forEach(c=>casaMap[c.id]=c.name);casaMap['outro']=S.casaOutro||'Outro';
+  body.innerHTML=list.map(t=>`<tr>
+    <td>${t.data||'-'}</td>
+    <td><span class="badge ${t.tipo==='Depósito'?'badge-green':t.tipo==='Saque'?'badge-red':'badge-gold'}">${t.tipo==='Depósito'?'💰':t.tipo==='Saque'?'📤':'🎁'} ${t.tipo}</span></td>
+    <td>${casaMap[t.casa]||t.casa}</td>
+    <td style="font-weight:700;color:${t.tipo==='Depósito'?'var(--green-text)':'var(--red-text)'}">${t.tipo==='Saque'?'-':'+'} ${fmtBRL(t.valor)}</td>
+    <td>${t.metodo||'-'}</td>
+    <td><span class="badge ${t.status==='Concluído'?'badge-green':t.status==='Pendente'?'badge-gold':'badge-gray'}">${t.status==='Concluído'?'✅':t.status==='Pendente'?'⏳':'❌'} ${t.status}</span></td>
+    <td style="color:var(--text2);font-size:12px">${t.obs||'-'}</td>
+    <td><div style="display:flex;gap:5px"><button class="btn-icon btn" onclick="editTrans(${t.id})" title="Editar">✏️</button><button class="btn-icon btn" onclick="delTrans(${t.id})" title="Remover" style="color:var(--red-text)">🗑</button></div></td>
+  </tr>`).join('');
+}
+
+// fix new transação button
+const _transbtn=document.querySelector('#page-transacoes .btn.btn-primary');if(_transbtn)_transbtn.addEventListener('click',openTransModal);
+
+// ══════════════════════════════════════════════
+// MODALS & UTILS
+// ══════════════════════════════════════════════
+function openM(id){document.getElementById(id).classList.add('open');}
+function closeM(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.mo').forEach(mo=>mo.addEventListener('click',e=>{if(e.target===mo)mo.classList.remove('open');}));
+
+function fmtBRL(v){return'R$ '+parseFloat(v||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});}
+
+let toastTimer;
+function showToast(msg){
+  const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+
+</script>
+</body>
+</html>
