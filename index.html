@@ -46,6 +46,23 @@ a{text-decoration:none}
 .login-tabs{display:flex;background:var(--bg);border-radius:10px;padding:4px;margin-bottom:22px}
 .login-tab{flex:1;padding:9px;text-align:center;border-radius:7px;cursor:pointer;font-size:13.5px;font-weight:600;color:var(--text2);border:none;background:none;font-family:'DM Sans',sans-serif;transition:all .15s}
 .login-tab.active{background:var(--white);color:var(--teal);box-shadow:0 1px 4px rgba(0,0,0,0.08)}
+
+.plan-selector{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px}
+.plan-option{position:relative;cursor:pointer}
+.plan-option input[type=radio]{position:absolute;opacity:0;width:0;height:0}
+.plan-option-box{border:1.5px solid var(--border);border-radius:10px;padding:11px 12px;transition:all .15s;background:var(--white);display:flex;flex-direction:column;gap:4px}
+.plan-option-box:hover{border-color:var(--teal)}
+.plan-option input:checked ~ .plan-option-box{border-color:var(--teal);background:var(--teal-light);box-shadow:0 0 0 2px rgba(12,184,154,.15)}
+.plan-option-top{display:flex;align-items:center;justify-content:space-between}
+.plan-option-name{font-size:13.5px;font-weight:700;color:var(--text)}
+.plan-option-badge{font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px}
+.plan-option-badge.trial{background:var(--gold-bg);color:#92400E}
+.plan-option-badge.pro{background:var(--teal-light);color:var(--teal)}
+.plan-option-desc{font-size:11.5px;color:var(--text2);line-height:1.4}
+.plan-option-check{width:16px;height:16px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
+.plan-option input:checked ~ .plan-option-box .plan-option-check{border-color:var(--teal);background:var(--teal)}
+.plan-option input:checked ~ .plan-option-box .plan-option-check::after{content:'';width:6px;height:6px;border-radius:50%;background:#fff;display:block}
+
 .pass-reqs{background:var(--bg);border-radius:9px;padding:12px 14px;margin-bottom:12px}
 .pass-reqs-title{font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--text2);margin-bottom:8px}
 .pass-req{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text2);margin-bottom:4px;transition:color .2s}
@@ -177,6 +194,125 @@ tbody tr:hover{background:#FAFBFC}
 /* CASA DOT */
 .casa-dot{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:6px}
 
+
+
+
+
+/* ── MÚLTIPLAS ── */
+.mult-stats{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px}
+.mult-table-wrap{overflow-x:auto;border-radius:12px;border:1px solid var(--border);background:var(--white)}
+.mult-table{width:100%;border-collapse:collapse;min-width:700px}
+.mult-table thead tr{background:#F7F9FB}
+.mult-table th{padding:11px 12px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text2);border-bottom:1px solid var(--border);white-space:nowrap;text-align:left}
+.mult-table td{padding:9px 12px;border-bottom:1px solid var(--border);vertical-align:middle;font-size:13.5px}
+.mult-table tr:last-child > td{border-bottom:none}
+.mult-expand-btn{background:none;border:1.5px solid var(--border);border-radius:7px;width:28px;height:28px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:all .2s;color:var(--text2);flex-shrink:0}
+.mult-expand-btn:hover{border-color:var(--teal);color:var(--teal)}
+.mult-expand-btn.open{background:var(--teal-light);border-color:var(--teal);color:var(--teal)}
+.mult-expand-btn svg{transition:transform .25s}
+.mult-expand-btn.open svg{transform:rotate(180deg)}
+.mult-games-row{background:#FAFBFC}
+.mult-games-row td{padding:0}
+.mult-games-inner{padding:12px 16px 16px 48px;display:none;animation:fadeIn .2s ease}
+.mult-games-inner.open{display:block}
+.mult-games-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text2);margin-bottom:10px}
+.mult-game-row{display:grid;grid-template-columns:1fr 1fr 1fr 80px 90px 90px;gap:8px;align-items:center;padding:8px 10px;border-radius:9px;border:1px solid var(--border);background:var(--white);margin-bottom:6px}
+.mult-game-row:last-child{margin-bottom:0}
+.mult-game-label{font-size:10px;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px}
+.mult-game-val{font-size:13px;font-weight:500}
+.mult-game-odd-badge{background:var(--teal-light);color:var(--teal);font-size:12px;font-weight:800;padding:3px 10px;border-radius:20px;text-align:center}
+.mult-game-res{font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px;text-align:center;white-space:nowrap}
+.mult-game-res.green{background:var(--green-bg);color:var(--green-text)}
+.mult-game-res.red{background:#FEF2F2;color:#DC2626}
+.mult-game-res.void{background:var(--bg);color:var(--text2)}
+.mult-game-res.pend{background:var(--gold-bg);color:#92400E}
+/* Modal bilhete */
+.bilhete-jogo-item{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;position:relative}
+.bilhete-jogo-num{font-size:10px;font-weight:800;color:var(--teal);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
+.bilhete-jogo-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.bilhete-jogo-remove{position:absolute;top:10px;right:10px;background:none;border:none;color:var(--text3);cursor:pointer;font-size:16px;transition:color .15s}
+.bilhete-jogo-remove:hover{color:#DC2626}
+.mult-odd-total{background:var(--teal-light);border-radius:10px;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;margin:12px 0}
+.mult-odd-total-label{font-size:12px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.5px}
+.mult-odd-total-val{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--teal)}
+.mult-lucro-preview{background:var(--green-bg);border-radius:10px;padding:10px 16px;display:flex;align-items:center;justify-content:space-between}
+.mult-lucro-preview-label{font-size:12px;font-weight:700;color:var(--green-text);text-transform:uppercase;letter-spacing:.5px}
+.mult-lucro-preview-val{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--green-text)}
+@media(max-width:640px){
+  .mult-stats{grid-template-columns:1fr 1fr}
+  .mult-game-row{grid-template-columns:1fr 1fr;gap:6px}
+}
+
+/* ── CONTROLE DE ENTRADAS ── */
+.entradas-filters{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:16px}
+.entradas-filters select,.entradas-filters input{padding:7px 11px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--text);background:var(--white);min-width:140px}
+.entradas-mes-nav{display:flex;align-items:center;gap:8px;margin-bottom:18px}
+.entradas-mes-nav button{width:30px;height:30px;border-radius:50%;border:1.5px solid var(--border);background:var(--white);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .15s}
+.entradas-mes-nav button:hover{border-color:var(--teal);color:var(--teal)}
+.entradas-mes-label{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;min-width:130px;text-align:center}
+.entradas-table-wrap{overflow-x:auto;border-radius:12px;border:1px solid var(--border);background:var(--white)}
+.entradas-table{width:100%;border-collapse:collapse;min-width:820px}
+.entradas-table thead tr{background:#F7F9FB}
+.entradas-table th{padding:11px 10px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text2);border-bottom:1px solid var(--border);white-space:nowrap;text-align:left}
+.entradas-table td{padding:7px 8px;border-bottom:1px solid var(--border);vertical-align:middle}
+.entradas-table tr:last-child td{border-bottom:none}
+.entradas-table tr:hover td{background:#FAFBFC}
+.et-input{width:100%;padding:5px 8px;border:1.5px solid transparent;border-radius:7px;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--text);background:transparent;transition:all .15s;min-width:70px}
+.et-input:focus{outline:none;border-color:var(--teal);background:var(--teal-light)}
+.et-input:hover{border-color:var(--border2);background:var(--bg)}
+.et-select{width:100%;padding:5px 8px;border:1.5px solid transparent;border-radius:7px;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--text);background:transparent;cursor:pointer;transition:all .15s}
+.et-select:focus{outline:none;border-color:var(--teal);background:var(--teal-light)}
+.et-select:hover{border-color:var(--border2);background:var(--bg)}
+.et-resultado{font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px;white-space:nowrap}
+.et-resultado.green{background:var(--green-bg);color:var(--green-text)}
+.et-resultado.red{background:#FEF2F2;color:#DC2626}
+.et-resultado.gray{background:var(--bg);color:var(--text2)}
+.entradas-stats{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:20px}
+.et-stat{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
+.et-stat-label{font-size:11px;color:var(--text2);font-weight:600;margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px}
+.et-stat-val{font-family:'Syne',sans-serif;font-size:20px;font-weight:800}
+@media(max-width:640px){.entradas-stats{grid-template-columns:1fr 1fr 1fr}.entradas-filters{flex-direction:column;align-items:stretch}}
+
+/* ── PLANOS PAGE ── */
+.plano-hero{text-align:center;margin-bottom:28px}
+.plano-hero-badge{display:inline-flex;align-items:center;gap:6px;background:var(--teal-light);color:var(--teal);font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;margin-bottom:10px;letter-spacing:.4px}
+.plano-hero h2{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;margin-bottom:6px}
+.plano-hero p{font-size:14px;color:var(--text2);max-width:440px;margin:0 auto}
+.plano-toggle{display:inline-flex;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:3px;gap:3px;margin:18px 0 28px}
+.plano-toggle-btn{padding:7px 20px;border-radius:7px;border:none;background:none;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--text2);transition:all .2s;position:relative}
+.plano-toggle-btn.active{background:var(--teal);color:#fff;box-shadow:0 2px 8px rgba(12,184,154,.3)}
+.plano-discount{position:absolute;top:-10px;right:-6px;background:var(--green);color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:20px}
+.plano-cards{display:grid;grid-template-columns:1fr 1fr;gap:18px;max-width:720px;margin:0 auto 32px}
+.plano-card{background:var(--white);border:1.5px solid var(--border);border-radius:18px;padding:26px 24px;position:relative;transition:transform .2s,box-shadow .2s}
+.plano-card:hover{transform:translateY(-3px);box-shadow:0 10px 32px rgba(0,0,0,.09)}
+.plano-card.current{border-color:var(--teal);box-shadow:0 0 0 3px rgba(12,184,154,.1)}
+.plano-card.destaque{border-color:#1C2434}
+.plano-current-badge{position:absolute;top:-12px;left:20px;background:var(--teal);color:#fff;font-size:10px;font-weight:800;padding:3px 12px;border-radius:20px;letter-spacing:.4px}
+.plano-destaque-badge{position:absolute;top:-12px;left:20px;background:#1C2434;color:#fff;font-size:10px;font-weight:800;padding:3px 12px;border-radius:20px;letter-spacing:.4px}
+.plano-card-icon{width:44px;height:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:14px}
+.plano-card-name{font-family:'Syne',sans-serif;font-size:19px;font-weight:800;margin-bottom:3px}
+.plano-card-desc{font-size:12.5px;color:var(--text2);margin-bottom:16px;line-height:1.5}
+.plano-price-val{font-family:'Syne',sans-serif;font-size:32px;font-weight:800;color:var(--text);line-height:1}
+.plano-price-val.free{color:var(--teal)}
+.plano-price-period{font-size:12px;color:var(--text2);margin-top:2px;margin-bottom:3px}
+.plano-price-economy{font-size:11.5px;color:var(--green-text);font-weight:600;min-height:16px;margin-bottom:16px}
+.plano-divider{height:1px;background:var(--border);margin-bottom:16px}
+.plano-features{list-style:none;display:flex;flex-direction:column;gap:9px;margin-bottom:20px}
+.plano-features li{display:flex;align-items:flex-start;gap:9px;font-size:13px}
+.pf-icon{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.pf-icon.yes{background:var(--green-bg)}
+.pf-icon.no{background:#F3F4F6}
+.pf-icon svg{width:10px;height:10px}
+.pf-disabled{color:var(--text3)!important}
+.plano-cta{width:100%;padding:11px;border-radius:10px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;border:none}
+.plano-cta-outline{background:var(--bg);color:var(--text2);border:1.5px solid var(--border);cursor:default}
+.plano-cta-pro{background:linear-gradient(135deg,#1C2434 0%,#374151 100%);color:#fff}
+.plano-cta-pro:hover{opacity:.9}
+.plano-trial-banner{background:linear-gradient(135deg,var(--teal) 0%,#07A085 100%);border-radius:14px;padding:18px 22px;color:#fff;display:flex;align-items:center;gap:16px;max-width:720px;margin:0 auto 28px}
+.plano-trial-icon{font-size:30px;flex-shrink:0}
+.plano-trial-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;margin-bottom:3px}
+.plano-trial-desc{font-size:12.5px;opacity:.9;line-height:1.5}
+@media(max-width:640px){.plano-cards{grid-template-columns:1fr;max-width:420px}}
 
 /* HOME INFO TABS & BANNERS */
 .home-info-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;max-width:820px;margin-left:auto;margin-right:auto}
@@ -501,6 +637,35 @@ tr.row-new{background:#f0fdf9}
           <input id="r-pass" type="password" placeholder="••••••••" oninput="checkPassReqs(this.value,'req')">
         </div>
         <div><label>Confirmar Senha</label><input id="r-conf" type="password" placeholder="••••••••"></div>
+
+        <div>
+          <label>Selecione seu Plano</label>
+          <div class="plan-selector">
+            <label class="plan-option">
+              <input type="radio" name="r-plano" id="r-plano-trial" value="trial" checked>
+              <div class="plan-option-box">
+                <div class="plan-option-top">
+                  <span class="plan-option-name">🆓 Trial</span>
+                  <div class="plan-option-check"></div>
+                </div>
+                <span class="plan-option-badge trial">GRÁTIS</span>
+                <div class="plan-option-desc">Acesso básico ao sistema, sem custo.</div>
+              </div>
+            </label>
+            <label class="plan-option">
+              <input type="radio" name="r-plano" id="r-plano-pro" value="pro">
+              <div class="plan-option-box">
+                <div class="plan-option-top">
+                  <span class="plan-option-name">🚀 Pro</span>
+                  <div class="plan-option-check"></div>
+                </div>
+                <span class="plan-option-badge pro">R$ 9,90/mês</span>
+                <div class="plan-option-desc">Acesso completo a todos os recursos.</div>
+              </div>
+            </label>
+          </div>
+        </div>
+
         <button class="btn-login" onclick="doRegister()">Criar Conta →</button>
         <div class="login-err" id="r-err">Erro ao criar conta</div>
       </div>
@@ -526,6 +691,10 @@ tr.row-new{background:#f0fdf9}
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
         Início
       </div>
+      <div class="nav-item" onclick="goPage('planos',this)" id="nav-planos">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
+        Meu Plano
+      </div>
       <div class="nav-item" onclick="goPage('admin',this)" id="nav-admin" style="display:none">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         Admin
@@ -547,6 +716,14 @@ tr.row-new{background:#f0fdf9}
       <div class="nav-item" onclick="goPage('gestao',this)" id="nav-gestao">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
         Gerenciamento de Banca
+      </div>
+      <div class="nav-item" onclick="goPage('entradas',this)" id="nav-entradas">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+        Controle de Entradas Simples
+      </div>
+      <div class="nav-item" onclick="goPage('multiplas',this)" id="nav-multiplas">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="4" rx="1"/><rect x="2" y="10" width="20" height="4" rx="1"/><rect x="2" y="17" width="20" height="4" rx="1"/></svg>
+        Múltiplas
       </div>
       <div class="nav-item" onclick="goPage('metas',this)" id="nav-metas">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
@@ -1033,12 +1210,255 @@ tr.row-new{background:#f0fdf9}
         <div style="overflow-x:auto"><table><thead><tr><th>Data</th><th>Tipo</th><th>Casa</th><th>Valor</th><th>Método</th><th>Status</th><th>Observação</th><th>Ações</th></tr></thead><tbody id="trans-body"></tbody></table></div>
       </div>
     </div>
+
+    <!-- PLANOS -->
+    <div class="page" id="page-planos">
+      <div class="plano-hero">
+        <div class="plano-hero-badge">💎 Planos KamaelBankroll</div>
+        <h2>Escolha seu plano</h2>
+        <p>Comece grátis no Trial e faça upgrade quando precisar de mais recursos.</p>
+      </div>
+
+      <!-- Banner trial atual -->
+      <div class="plano-trial-banner" id="plano-trial-banner">
+        <div class="plano-trial-icon">🎉</div>
+        <div>
+          <div class="plano-trial-title">Você está no plano Trial</div>
+          <div class="plano-trial-desc">Seu plano Trial é gratuito e ativo agora. Faça upgrade para Pro e desbloqueie todos os recursos sem limitações.</div>
+        </div>
+      </div>
+
+      <!-- Toggle mensal/anual -->
+      <div style="text-align:center">
+        <div class="plano-toggle">
+          <button class="plano-toggle-btn active" id="ptbtn-mensal" onclick="setPlanoCobranca('mensal')">Mensal</button>
+          <button class="plano-toggle-btn" id="ptbtn-anual" onclick="setPlanoCobranca('anual')">
+            Anual
+            <span class="plano-discount">-20%</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Cards -->
+      <div class="plano-cards">
+
+        <!-- TRIAL -->
+        <div class="plano-card current">
+          <div class="plano-current-badge">✓ SEU PLANO ATUAL</div>
+          <div class="plano-card-icon" style="background:var(--teal-light)">🆓</div>
+          <div class="plano-card-name">Trial</div>
+          <div class="plano-card-desc">Plano gratuito ativado automaticamente no cadastro. Perfeito para conhecer o sistema.</div>
+          <div class="plano-price-val free">Grátis</div>
+          <div class="plano-price-period">Para sempre</div>
+          <div class="plano-price-economy"></div>
+          <div class="plano-divider"></div>
+          <ul class="plano-features" id="trial-features">
+            <!-- preenchido por JS conforme permissões -->
+          </ul>
+          <button class="plano-cta plano-cta-outline" disabled>✓ Plano ativo</button>
+        </div>
+
+        <!-- PRO -->
+        <div class="plano-card destaque">
+          <div class="plano-destaque-badge">⭐ RECOMENDADO</div>
+          <div class="plano-card-icon" style="background:#1C2434">🚀</div>
+          <div class="plano-card-name">Pro</div>
+          <div class="plano-card-desc">Acesso completo a todos os recursos. Para apostadores sérios em busca de resultados consistentes.</div>
+          <div class="plano-price-val" id="pro-plano-val">R$ 9,90</div>
+          <div class="plano-price-period" id="pro-plano-per">por mês</div>
+          <div class="plano-price-economy" id="pro-plano-eco"></div>
+          <div class="plano-divider"></div>
+          <ul class="plano-features" id="pro-features">
+            <!-- preenchido por JS conforme permissões -->
+          </ul>
+          <button class="plano-cta plano-cta-pro" onclick="assinarPro()">Assinar Pro →</button>
+        </div>
+
+      </div>
+
+      <!-- Aviso responsabilidade -->
+      <div style="max-width:720px;margin:0 auto;text-align:center;font-size:12px;color:var(--text3);line-height:1.6;padding-bottom:10px">
+        ⚠️ Apostas esportivas envolvem riscos. O KamaelBankroll é uma ferramenta de organização e não garante lucros. Assine com responsabilidade.
+      </div>
+    </div>
+
+
+    <!-- CONTROLE DE ENTRADAS -->
+    <div class="page" id="page-entradas">
+      <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px">
+        <div>
+          <div class="page-title" style="display:flex;align-items:center;gap:8px">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+            Controle de Entradas Simples
+          </div>
+          <div class="page-sub">Registre e acompanhe todas as suas apostas por mês</div>
+        </div>
+        <button class="btn btn-primary" onclick="addEntradaRow()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Adicionar Entrada
+        </button>
+      </div>
+
+      <!-- Navegação por mês -->
+      <div class="entradas-mes-nav">
+        <button onclick="navMes(-1)">&#8249;</button>
+        <div class="entradas-mes-label" id="entradas-mes-label">—</div>
+        <button onclick="navMes(1)">&#8250;</button>
+      </div>
+
+      <!-- Stats -->
+      <div class="entradas-stats" id="entradas-stats">
+        <div class="et-stat"><div class="et-stat-label">Total Entradas</div><div class="et-stat-val" id="est-total">0</div></div>
+        <div class="et-stat"><div class="et-stat-label">Ganhos ✅</div><div class="et-stat-val" style="color:var(--green-text)" id="est-ganhos">0</div></div>
+        <div class="et-stat"><div class="et-stat-label">Perdas ❌</div><div class="et-stat-val" style="color:#DC2626" id="est-perdas">0</div></div>
+        <div class="et-stat"><div class="et-stat-label">Void ⬜</div><div class="et-stat-val" style="color:var(--text2)" id="est-void">0</div></div>
+        <div class="et-stat"><div class="et-stat-label">Pendentes ⏳</div><div class="et-stat-val" style="color:var(--gold)" id="est-pend">0</div></div>
+        <div class="et-stat"><div class="et-stat-label">Aproveit.</div><div class="et-stat-val" id="est-aproveit">0%</div></div>
+      </div>
+
+      <!-- Filtros -->
+      <div class="entradas-filters">
+        <select id="ef-campeonato" onchange="renderEntradas()">
+          <option value="">🏆 Todos os campeonatos</option>
+        </select>
+        <select id="ef-estrategia" onchange="renderEntradas()">
+          <option value="">⚙️ Todas as estratégias</option>
+        </select>
+        <select id="ef-resultado" onchange="renderEntradas()">
+          <option value="">📊 Todos os resultados</option>
+          <option value="Green">✅ Green</option>
+          <option value="Red">❌ Red</option>
+          <option value="Void">⬜ Void</option>
+          <option value="Pendente">⏳ Pendente</option>
+        </select>
+      </div>
+
+      <!-- Tabela -->
+      <div class="entradas-table-wrap">
+        <table class="entradas-table">
+          <thead>
+            <tr>
+              <th style="width:100px">Data</th>
+              <th style="min-width:130px">Campeonato</th>
+              <th style="min-width:120px">Mandante</th>
+              <th style="min-width:120px">Visitante</th>
+              <th style="min-width:130px">Estratégia</th>
+              <th style="width:80px">Odd</th>
+              <th style="width:90px">Stake (R$)</th>
+              <th style="width:130px">Resultado</th>
+              <th style="width:80px">Lucro</th>
+              <th style="width:65px">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="entradas-tbody"></tbody>
+        </table>
+      </div>
+      <div id="entradas-empty" style="text-align:center;padding:32px;color:var(--text2);font-size:14px;display:none">
+        Nenhuma entrada encontrada. Clique em <strong>+ Adicionar Entrada</strong> para começar.
+      </div>
+    </div>
+
+
+    <!-- MÚLTIPLAS -->
+    <div class="page" id="page-multiplas">
+      <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px">
+        <div>
+          <div class="page-title" style="display:flex;align-items:center;gap:8px">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2"><rect x="2" y="3" width="20" height="4" rx="1"/><rect x="2" y="10" width="20" height="4" rx="1"/><rect x="2" y="17" width="20" height="4" rx="1"/></svg>
+            Múltiplas
+          </div>
+          <div class="page-sub">Gerencie seus bilhetes de apostas múltiplas</div>
+        </div>
+        <button class="btn btn-primary" onclick="abrirNovoBilhete()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Novo Bilhete
+        </button>
+      </div>
+
+      <!-- Stats -->
+      <div class="mult-stats">
+        <div class="et-stat"><div class="et-stat-label">Total Bilhetes</div><div class="et-stat-val" id="ms-total">0</div></div>
+        <div class="et-stat"><div class="et-stat-label">Ganhos ✅</div><div class="et-stat-val" style="color:var(--green-text)" id="ms-ganhos">0</div></div>
+        <div class="et-stat"><div class="et-stat-label">Perdas ❌</div><div class="et-stat-val" style="color:#DC2626" id="ms-perdas">0</div></div>
+        <div class="et-stat"><div class="et-stat-label">Aproveit.</div><div class="et-stat-val" id="ms-aproveit">0%</div></div>
+        <div class="et-stat"><div class="et-stat-label">Lucro Total</div><div class="et-stat-val" id="ms-lucro">R$ 0</div></div>
+      </div>
+
+      <!-- Tabela -->
+      <div class="mult-table-wrap">
+        <table class="mult-table">
+          <thead>
+            <tr>
+              <th style="width:36px"></th>
+              <th style="width:100px">Data</th>
+              <th style="width:80px">Stake</th>
+              <th style="width:80px">Nº Jogos</th>
+              <th style="width:90px">Odd Total</th>
+              <th style="width:120px">Resultado</th>
+              <th style="width:100px">Lucro</th>
+              <th style="width:90px">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="mult-tbody"></tbody>
+        </table>
+      </div>
+      <div id="mult-empty" style="text-align:center;padding:40px;color:var(--text2);font-size:14px;display:none">
+        Nenhum bilhete registrado. Clique em <strong>+ Novo Bilhete</strong> para começar.
+      </div>
+    </div>
+
   </div><!-- /main -->
 </div><!-- /app -->
 
 <!-- ════════════════ MODALS ════════════════ -->
 
 <!-- ADD USER -->
+
+<div class="mo" id="m-bilhete">
+  <div class="modal" style="max-width:580px;max-height:90vh;overflow-y:auto">
+    <div class="mh">
+      <div class="mt2" id="m-bilhete-title">🎫 Novo Bilhete</div>
+      <button class="mc" onclick="closeM('m-bilhete')">✕</button>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+      <div class="fg">
+        <label class="fl">Data</label>
+        <input class="fi" type="date" id="mb-data">
+      </div>
+      <div class="fg">
+        <label class="fl">Stake (R$)</label>
+        <input class="fi" type="number" step="0.01" min="0" id="mb-stake" placeholder="Ex: 50.00" oninput="calcBilhetePreview()">
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text2)">Jogos do Bilhete</div>
+      <button class="btn btn-outline" onclick="addBilheteJogo()" style="font-size:12px;padding:5px 12px">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Adicionar Jogo
+      </button>
+    </div>
+
+    <div id="mb-jogos-list"></div>
+
+    <div class="mult-odd-total">
+      <div class="mult-odd-total-label">Odd Total (multiplicada)</div>
+      <div class="mult-odd-total-val" id="mb-odd-total">1.00</div>
+    </div>
+    <div class="mult-lucro-preview" id="mb-lucro-wrap" style="display:none">
+      <div class="mult-lucro-preview-label">Lucro Potencial</div>
+      <div class="mult-lucro-preview-val" id="mb-lucro-prev">R$ 0,00</div>
+    </div>
+
+    <div id="mb-err" style="color:var(--red);font-size:12.5px;margin-top:8px;display:none"></div>
+    <div style="display:flex;gap:9px;margin-top:16px">
+      <button class="btn btn-outline" style="flex:1;justify-content:center" onclick="closeM('m-bilhete')">Cancelar</button>
+      <button class="btn btn-primary" style="flex:1;justify-content:center" onclick="salvarBilhete()">Salvar Bilhete</button>
+    </div>
+  </div>
+</div>
+
 <div class="mo" id="m-adduser">
   <div class="modal">
     <div class="mh"><div class="mt2">➕ Novo Usuário</div><button class="mc" onclick="closeM('m-adduser')">✕</button></div>
@@ -1050,6 +1470,54 @@ tr.row-new{background:#f0fdf9}
 </div>
 
 <!-- CHANGE PASS -->
+
+<div class="mo" id="m-edit-user">
+  <div class="modal">
+    <div class="mh">
+      <div class="mt2">✏️ Editar Usuário</div>
+      <button class="mc" onclick="closeM('m-edit-user')">✕</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px" id="eu-grid">
+      <div class="fg" style="grid-column:1/-1">
+        <label class="fl">Nome Completo</label>
+        <input class="fi" id="eu-nome" type="text" placeholder="Nome completo">
+      </div>
+      <div class="fg">
+        <label class="fl">Email</label>
+        <input class="fi" id="eu-email" type="email" placeholder="email@exemplo.com">
+      </div>
+      <div class="fg">
+        <label class="fl">Nome de Usuário</label>
+        <input class="fi" id="eu-user" type="text" placeholder="usuario123" oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9_]/g,'')">
+      </div>
+      <div class="fg">
+        <label class="fl">Telefone (WhatsApp)</label>
+        <input class="fi" id="eu-tel" type="tel" placeholder="(11) 99999-9999" oninput="maskTel(this)">
+      </div>
+      <div class="fg">
+        <label class="fl">Tipo de Conta</label>
+        <select class="fi" id="eu-role">
+          <option value="Usuário">Usuário</option>
+          <option value="Admin">Admin</option>
+          <option value="Master">Master</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label class="fl">Plano</label>
+        <select class="fi" id="eu-plano">
+          <option value="trial">Trial</option>
+          <option value="pro">Pro</option>
+        </select>
+      </div>
+    </div>
+    <div id="eu-err" style="color:var(--red);font-size:12.5px;margin-top:8px;display:none"></div>
+    <div style="display:flex;gap:9px;margin-top:16px">
+      <button class="btn btn-outline" style="flex:1;justify-content:center" onclick="closeM('m-edit-user')">Cancelar</button>
+      <button class="btn btn-primary" style="flex:1;justify-content:center" onclick="salvarEditUser()">Salvar alterações</button>
+    </div>
+  </div>
+</div>
+
 <div class="mo" id="m-senha">
   <div class="modal">
     <div class="mh"><div class="mt2">🔑 Definir Senha</div><button class="mc" onclick="closeM('m-senha')">✕</button></div>
@@ -1294,7 +1762,9 @@ function startApp(u){
   buildCasaSelects();
   selPrf(S.perfil);
   setTimeout(initHomeDica,50);
-  goPage('home',document.getElementById('nav-home'));
+  const lastPage=localStorage.getItem('kt_lastpage')||'home';
+  const lastNav=document.getElementById('nav-'+lastPage);
+  goPage(lastPage,lastNav||document.getElementById('nav-home'));
 }
 function sair(){
   localStorage.removeItem('kt_session');
@@ -1315,6 +1785,500 @@ window.onload=()=>{
 };
 
 
+
+
+
+// ══════════════════════════════════════════════
+// CONTROLE DE ENTRADAS
+// ══════════════════════════════════════════════
+const MESES_PTBR=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const CAMPEONATOS=['Brasileirão Série A','Brasileirão Série B','Copa do Brasil','Libertadores','Sul-Americana','Champions League','Premier League','La Liga','Serie A','Bundesliga','Ligue 1','Outro'];
+const ESTRATEGIAS=['Lay Favorito','Back Favorito','Gols +1.5','Gols +2.5','Ambas Marcam','Handicap Asiático','Over/Under','Dupla Hipótese','Empate com Volta','Lay 0x0','Outra'];
+
+function getEntradasKey(){
+  const u=S.viewingUser||S.loggedUser;
+  return 'kt_entradas_'+(u?.email||'');
+}
+function loadEntradas(){
+  try{return JSON.parse(localStorage.getItem(getEntradasKey()))||[];}catch{return [];}
+}
+function saveEntradas(data){
+  localStorage.setItem(getEntradasKey(),JSON.stringify(data));
+}
+
+let entradasMesIdx = new Date().getMonth();
+let entradasAno   = new Date().getFullYear();
+
+function navMes(dir){
+  entradasMesIdx+=dir;
+  if(entradasMesIdx>11){entradasMesIdx=0;entradasAno++;}
+  if(entradasMesIdx<0){entradasMesIdx=11;entradasAno--;}
+  renderEntradas();
+}
+
+function renderEntradas(){
+  const label=document.getElementById('entradas-mes-label');
+  if(label)label.textContent=MESES_PTBR[entradasMesIdx]+' '+entradasAno;
+
+  const all=loadEntradas();
+  // filter by current month/year
+  const mesStr=String(entradasAno)+'-'+String(entradasMesIdx+1).padStart(2,'0');
+  let rows=all.filter(r=>(!r.data||r.data.startsWith(mesStr)));
+
+  // populate filter dropdowns
+  const fCamp=document.getElementById('ef-campeonato');
+  const fEstr=document.getElementById('ef-estrategia');
+  if(fCamp&&fEstr){
+    const selC=fCamp.value, selE=fEstr.value;
+    const camps=[...new Set(all.map(r=>r.campeonato).filter(Boolean))];
+    const estrs=[...new Set(all.map(r=>r.estrategia).filter(Boolean))];
+    fCamp.innerHTML='<option value="">🏆 Todos os campeonatos</option>'+camps.map(c=>`<option value="${c}" ${selC===c?'selected':''}>${c}</option>`).join('');
+    fEstr.innerHTML='<option value="">⚙️ Todas as estratégias</option>'+estrs.map(e=>`<option value="${e}" ${selE===e?'selected':''}>${e}</option>`).join('');
+
+    const fRes=document.getElementById('ef-resultado')?.value||'';
+    if(selC) rows=rows.filter(r=>r.campeonato===selC);
+    if(selE) rows=rows.filter(r=>r.estrategia===selE);
+    if(fRes) rows=rows.filter(r=>r.resultado===fRes);
+  }
+
+  // stats
+  const saved=rows.filter(r=>r.id&&r.id!=='new');
+  const total=saved.length;
+  const ganhos=saved.filter(r=>r.resultado==='Green').length;
+  const perdas=saved.filter(r=>r.resultado==='Red').length;
+  const voids=saved.filter(r=>r.resultado==='Void').length;
+  const pend=saved.filter(r=>r.resultado==='Pendente').length;
+  // Void conta como positivo (não perde dinheiro)
+  const aproveit=total>0?Math.round((ganhos+voids)/total*100):0;
+  const stEl=document.getElementById('est-total');if(stEl)stEl.textContent=total;
+  const sgEl=document.getElementById('est-ganhos');if(sgEl)sgEl.textContent=ganhos;
+  const spEl=document.getElementById('est-perdas');if(spEl)spEl.textContent=perdas;
+  const svEl=document.getElementById('est-void');if(svEl)svEl.textContent=voids;
+  const spnEl=document.getElementById('est-pend');if(spnEl)spnEl.textContent=pend;
+  const saEl=document.getElementById('est-aproveit');if(saEl)saEl.textContent=aproveit+'%';
+
+  const tbody=document.getElementById('entradas-tbody');
+  const empty=document.getElementById('entradas-empty');
+  if(!tbody)return;
+  tbody.innerHTML='';
+
+  const savedCheck=rows.filter(r=>r.id!=='new');
+  if(savedCheck.length===0&&rows.filter(r=>r.id==='new').length===0){
+    if(empty)empty.style.display='block';
+  } else {
+    if(empty)empty.style.display='none';
+  }
+
+  rows.forEach((row,i)=>{
+    const isNew=row.id==='new';
+    const lucro=calcLucroEntrada(row);
+    const lucroStr=lucro!==null?(lucro>=0?'+R$ '+lucro.toFixed(2):'−R$ '+Math.abs(lucro).toFixed(2)):'—';
+    const lucroColor=lucro===null?'var(--text2)':lucro>=0?'var(--green-text)':'#DC2626';
+    const res=row.resultado||'';
+    const resCls=res==='Green'?'green':res==='Red'?'red':'gray';
+    const resLabel=res==='Green'?'✅ Green':res==='Red'?'❌ Red':res==='Void'?'⬜ Void':res==='Pendente'?'⏳ Pendente':res||'—';
+
+    const campOpts=CAMPEONATOS.map(c=>`<option value="${c}" ${row.campeonato===c?'selected':''}>${c}</option>`).join('');
+    const estrOpts=ESTRATEGIAS.map(e=>`<option value="${e}" ${row.estrategia===e?'selected':''}>${e}</option>`).join('');
+    const resOpts=['Green','Red','Void','Pendente'].map(r=>`<option value="${r}" ${row.resultado===r?'selected':''}>${r==='Green'?'✅ Green':r==='Red'?'❌ Red':r==='Void'?'⬜ Void':'⏳ Pendente'}</option>`).join('');
+
+    const tr=document.createElement('tr');
+    if(isNew)tr.style.background='#F8FFFB';
+    tr.innerHTML=`
+      <td><input class="et-input" type="date" value="${row.data||''}" onchange="updateEntrada(${i},'data',this.value)"></td>
+      <td><input class="et-input" type="text" value="${row.campeonato||''}" placeholder="Ex: Brasileirão" onchange="updateEntrada(${i},'campeonato',this.value)"></td>
+      <td><input class="et-input" type="text" value="${row.mandante||''}" placeholder="Time mandante" onchange="updateEntrada(${i},'mandante',this.value)"></td>
+      <td><input class="et-input" type="text" value="${row.visitante||''}" placeholder="Time visitante" onchange="updateEntrada(${i},'visitante',this.value)"></td>
+      <td><input class="et-input" type="text" value="${row.estrategia||''}" placeholder="Ex: Lay Favorito" onchange="updateEntrada(${i},'estrategia',this.value)"></td>
+      <td><input class="et-input" type="number" step="0.01" min="1" value="${row.odd||''}" placeholder="1.50" style="max-width:70px" onchange="updateEntrada(${i},'odd',this.value)"></td>
+      <td><input class="et-input" type="number" step="0.01" min="0" value="${row.stake||''}" placeholder="0.00" style="max-width:80px" onchange="updateEntrada(${i},'stake',this.value)"></td>
+      <td style="min-width:130px"><select class="et-select" style="min-width:120px" onchange="updateEntrada(${i},'resultado',this.value)"><option value="">—</option>${resOpts}</select></td>
+      <td style="font-size:12.5px;font-weight:700;color:${lucroColor};white-space:nowrap">${lucroStr}</td>
+      <td>
+        ${isNew
+          ? `<button title="Salvar" onclick="salvarEntrada(${i})" style="background:var(--teal);color:#fff;border:none;border-radius:7px;padding:5px 9px;cursor:pointer;font-size:14px">✅</button>
+             <button title="Cancelar" onclick="cancelEntrada(${i})" style="background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:5px 9px;cursor:pointer;font-size:14px;margin-left:4px">✕</button>`
+          : `<button title="Salvar" onclick="salvarEntrada(${i})" style="background:var(--white);color:var(--teal);border:1.5px solid var(--teal);border-radius:7px;padding:5px 9px;cursor:pointer;font-size:14px;display:inline-flex;align-items:center;justify-content:center;transition:all .15s" onmouseover="this.style.background='var(--teal-light)'" onmouseout="this.style.background='var(--white)'"><svg width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.5'><polyline points='20 6 9 17 4 12'/></svg></button>
+             <button title="Excluir" onclick="deletarEntrada(${i})" style="background:var(--white);color:#DC2626;border:1.5px solid #FECACA;border-radius:7px;padding:5px 9px;cursor:pointer;font-size:14px;display:inline-flex;align-items:center;justify-content:center;transition:all .15s;margin-left:4px" onmouseover="this.style.background='#FEF2F2'" onmouseout="this.style.background='var(--white)'"><svg width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2.5'><polyline points='3 6 5 6 21 6'/><path d='M19 6l-1 14H6L5 6'/><path d='M10 11v6'/><path d='M14 11v6'/></svg></button>`
+        }
+      </td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function calcLucroEntrada(row){
+  const odd=parseFloat(row.odd);
+  const stake=parseFloat(row.stake);
+  if(!odd||!stake||!row.resultado)return null;
+  if(row.resultado==='Green')return parseFloat(((odd-1)*stake).toFixed(2));
+  if(row.resultado==='Red')return -stake;
+  if(row.resultado==='Void')return 0;
+  return null;
+}
+
+function updateEntrada(idx,field,val){
+  const all=loadEntradas();
+  const mesStr=String(entradasAno)+'-'+String(entradasMesIdx+1).padStart(2,'0');
+  const rows=all.filter(r=>(!r.data||r.data.startsWith(mesStr)));
+  const row=rows[idx];
+  if(!row)return;
+  row[field]=val;
+  // update in all
+  const allIdx=all.findIndex(r=>r===row||(r.id&&r.id===row.id));
+  if(allIdx>=0)all[allIdx]=row;
+  saveEntradas(all);
+  // refresh lucro cell only
+  const tbody=document.getElementById('entradas-tbody');
+  if(tbody){
+    const tr=tbody.rows[idx];
+    if(tr){
+      const lucro=calcLucroEntrada(row);
+      const lucroStr=lucro!==null?(lucro>=0?'+R$ '+lucro.toFixed(2):'−R$ '+Math.abs(lucro).toFixed(2)):'—';
+      const lucroColor=lucro===null?'var(--text2)':lucro>=0?'var(--green-text)':'#DC2626';
+      tr.cells[8].style.color=lucroColor;
+      tr.cells[8].textContent=lucroStr;
+    }
+  }
+}
+
+function addEntradaRow(){
+  const all=loadEntradas();
+  const today=new Date().toISOString().split('T')[0];
+  all.push({id:'new',data:today,campeonato:'',mandante:'',visitante:'',estrategia:'',odd:'',stake:'',resultado:''});
+  saveEntradas(all);
+  renderEntradas();
+  // scroll to bottom
+  setTimeout(()=>{const w=document.querySelector('.entradas-table-wrap');if(w)w.scrollTop=w.scrollHeight;},50);
+}
+
+function salvarEntrada(idx){
+  const all=loadEntradas();
+  const mesStr=String(entradasAno)+'-'+String(entradasMesIdx+1).padStart(2,'0');
+  const rows=all.filter(r=>(!r.data||r.data.startsWith(mesStr)));
+  const row=rows[idx];
+  if(!row)return;
+  if(row.id==='new')row.id='e_'+Date.now()+'_'+Math.random().toString(36).substr(2,5);
+  const allIdx=all.findIndex(r=>r===row||(r.id&&r.id===row.id));
+  if(allIdx>=0)all[allIdx]=row;
+  saveEntradas(all);
+  showToast('Entrada salva! ✅');
+  renderEntradas();
+}
+
+function cancelEntrada(idx){
+  const all=loadEntradas();
+  const mesStr=String(entradasAno)+'-'+String(entradasMesIdx+1).padStart(2,'0');
+  const rows=all.filter(r=>(!r.data||r.data.startsWith(mesStr)));
+  const row=rows[idx];
+  const allIdx=all.indexOf(row);
+  if(allIdx>=0)all.splice(allIdx,1);
+  saveEntradas(all);
+  renderEntradas();
+}
+
+function deletarEntrada(idx){
+  const all=loadEntradas();
+  const mesStr=String(entradasAno)+'-'+String(entradasMesIdx+1).padStart(2,'0');
+  const rows=all.filter(r=>(!r.data||r.data.startsWith(mesStr)));
+  const row=rows[idx];
+  const allIdx=all.indexOf(row);
+  if(allIdx>=0)all.splice(allIdx,1);
+  saveEntradas(all);
+  showToast('Entrada removida!');
+  renderEntradas();
+}
+
+
+// ══════════════════════════════════════════════
+// MÚLTIPLAS
+// ══════════════════════════════════════════════
+function getMultiplasKey(){
+  const u=S.viewingUser||S.loggedUser;
+  return 'kt_multiplas_'+(u?.email||'');
+}
+function loadMultiplas(){try{return JSON.parse(localStorage.getItem(getMultiplasKey()))||[];}catch{return [];}}
+function saveMultiplas(d){localStorage.setItem(getMultiplasKey(),JSON.stringify(d));}
+
+// calc bilhete resultado based on jogos
+function calcBilheteStatus(jogos){
+  if(!jogos||jogos.length===0)return 'Pendente';
+  // Red em qualquer jogo = bilhete perdido
+  if(jogos.some(j=>j.resultado==='Red'))return 'Red';
+  // Pendente se algum jogo ainda não tem resultado
+  if(jogos.some(j=>j.resultado==='Pendente'||!j.resultado))return 'Pendente';
+  // Jogos ativos = excluindo os Void
+  const ativos=jogos.filter(j=>j.resultado!=='Void');
+  // Se todos são Void = Void
+  if(ativos.length===0)return 'Void';
+  // Green se todos os ativos são Green
+  if(ativos.every(j=>j.resultado==='Green'))return 'Green';
+  return 'Pendente';
+}
+function calcOddTotal(jogos){
+  if(!jogos||jogos.length===0)return 1;
+  // Jogos Void têm odd anulada (tratados como odd 1.00)
+  return jogos.reduce((acc,j)=>j.resultado==='Void'?acc:acc*(parseFloat(j.odd)||1),1);
+}
+function calcLucroMultipla(stake,jogos){
+  const s=parseFloat(stake)||0;
+  const oddTotal=calcOddTotal(jogos);
+  const status=calcBilheteStatus(jogos);
+  if(status==='Green')return parseFloat(((s*oddTotal)-s).toFixed(2));
+  if(status==='Red')return -s;
+  if(status==='Void')return 0;
+  return null;
+}
+
+function renderMultiplas(){
+  const all=loadMultiplas();
+  const tbody=document.getElementById('mult-tbody');
+  const empty=document.getElementById('mult-empty');
+  if(!tbody)return;
+
+  // stats
+  const total=all.length;
+  const ganhos=all.filter(b=>calcBilheteStatus(b.jogos)==='Green').length;
+  const perdas=all.filter(b=>calcBilheteStatus(b.jogos)==='Red').length;
+  const aproveit=total>0?Math.round(ganhos/total*100):0;
+  const lucroTotal=all.reduce((acc,b)=>{const l=calcLucroMultipla(b.stake,b.jogos);return acc+(l||0);},0);
+  const msT=document.getElementById('ms-total');if(msT)msT.textContent=total;
+  const msG=document.getElementById('ms-ganhos');if(msG)msG.textContent=ganhos;
+  const msP=document.getElementById('ms-perdas');if(msP)msP.textContent=perdas;
+  const msA=document.getElementById('ms-aproveit');if(msA)msA.textContent=aproveit+'%';
+  const msL=document.getElementById('ms-lucro');
+  if(msL){msL.textContent=(lucroTotal>=0?'+':'')+'R$ '+lucroTotal.toFixed(2);msL.style.color=lucroTotal>=0?'var(--green-text)':'#DC2626';}
+
+  tbody.innerHTML='';
+  if(total===0){if(empty)empty.style.display='block';return;}
+  if(empty)empty.style.display='none';
+
+  all.forEach((b,idx)=>{
+    const status=calcBilheteStatus(b.jogos);
+    const oddTotal=calcOddTotal(b.jogos).toFixed(2);
+    const lucro=calcLucroMultipla(b.stake,b.jogos);
+    const lucroStr=lucro===null?'—':(lucro>=0?'+R$ '+lucro.toFixed(2):'−R$ '+Math.abs(lucro).toFixed(2));
+    const lucroColor=lucro===null?'var(--text2)':lucro>=0?'var(--green-text)':'#DC2626';
+    const resCls=status==='Green'?'green':status==='Red'?'red':status==='Void'?'void':'pend';
+    const resLabel=status==='Green'?'✅ Green':status==='Red'?'❌ Red':status==='Void'?'⬜ Void':'⏳ Pendente';
+    const rowId='mult-row-'+idx;
+    const detailId='mult-detail-'+idx;
+
+    // Summary row
+    const tr=document.createElement('tr');
+    tr.id=rowId;
+    tr.innerHTML=`
+      <td>
+        <button class="mult-expand-btn" id="mult-btn-${idx}" onclick="toggleMultRow(${idx})">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+      </td>
+      <td>${b.data||'—'}</td>
+      <td style="font-weight:600">R$ ${parseFloat(b.stake||0).toFixed(2)}</td>
+      <td style="text-align:center">
+        <span style="background:var(--teal-light);color:var(--teal);font-weight:800;font-size:12px;padding:3px 10px;border-radius:20px">${(b.jogos||[]).length} jogo${(b.jogos||[]).length!==1?'s':''}</span>
+      </td>
+      <td style="font-family:'Syne',sans-serif;font-weight:800;font-size:15px;color:var(--teal)">${oddTotal}</td>
+      <td><span class="mult-game-res ${resCls}">${resLabel}</span></td>
+      <td style="font-weight:700;color:${lucroColor};white-space:nowrap">${lucroStr}</td>
+      <td style="display:flex;gap:5px;align-items:center">
+        <button title="Editar" onclick="editarBilhete(${idx})" style="background:var(--white);color:var(--teal);border:1.5px solid var(--teal);border-radius:7px;padding:5px 9px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center" onmouseover="this.style.background='var(--teal-light)'" onmouseout="this.style.background='var(--white)'">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
+        <button title="Excluir" onclick="excluirBilhete(${idx})" style="background:var(--white);color:#DC2626;border:1.5px solid #FECACA;border-radius:7px;padding:5px 9px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center" onmouseover="this.style.background='#FEF2F2'" onmouseout="this.style.background='var(--white)'">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+        </button>
+      </td>`;
+    tbody.appendChild(tr);
+
+    // Detail row
+    const td2=document.createElement('tr');
+    td2.className='mult-games-row';
+    td2.id=detailId;
+    const jogosHtml=(b.jogos||[]).map((j,ji)=>{
+      const jResCls=j.resultado==='Green'?'green':j.resultado==='Red'?'red':j.resultado==='Void'?'void':'pend';
+      const jResLabel=j.resultado==='Green'?'✅ Green':j.resultado==='Red'?'❌ Red':j.resultado==='Void'?'⬜ Void':j.resultado?'⏳ Pendente':'—';
+      return `<div class="mult-game-row">
+        <div><div class="mult-game-label">Mandante</div><div class="mult-game-val">${j.mandante||'—'}</div></div>
+        <div><div class="mult-game-label">Visitante</div><div class="mult-game-val">${j.visitante||'—'}</div></div>
+        <div><div class="mult-game-label">Mercado</div><div class="mult-game-val">${j.mercado||'—'}</div></div>
+        <div style="text-align:center"><div class="mult-game-label">Odd</div><div class="mult-game-odd-badge">${parseFloat(j.odd||1).toFixed(2)}</div></div>
+        <div style="text-align:center"><div class="mult-game-label">Resultado</div><span class="mult-game-res ${jResCls}">${jResLabel}</span></div>
+      </div>`;
+    }).join('');
+    td2.innerHTML=`<td colspan="8"><div class="mult-games-inner" id="mult-inner-${idx}">
+      <div class="mult-games-title">📋 Jogos do Bilhete</div>
+      ${jogosHtml}
+    </div></td>`;
+    tbody.appendChild(td2);
+  });
+}
+
+function toggleMultRow(idx){
+  const inner=document.getElementById('mult-inner-'+idx);
+  const btn=document.getElementById('mult-btn-'+idx);
+  if(!inner||!btn)return;
+  const open=inner.classList.toggle('open');
+  btn.classList.toggle('open',open);
+}
+
+// ── MODAL ──────────────────────────────────────────────────────────────────
+let _editBilheteIdx=null;
+let _mbJogos=[];
+
+function abrirNovoBilhete(){
+  _editBilheteIdx=null;
+  _mbJogos=[{mandante:'',visitante:'',mercado:'',odd:'',resultado:''}];
+  document.getElementById('m-bilhete-title').textContent='🎫 Novo Bilhete';
+  document.getElementById('mb-data').value=new Date().toISOString().split('T')[0];
+  document.getElementById('mb-stake').value='';
+  document.getElementById('mb-err').style.display='none';
+  renderBilheteJogos();
+  openM('m-bilhete');
+}
+function editarBilhete(idx){
+  const all=loadMultiplas();
+  const b=all[idx];if(!b)return;
+  _editBilheteIdx=idx;
+  _mbJogos=JSON.parse(JSON.stringify(b.jogos||[]));
+  document.getElementById('m-bilhete-title').textContent='✏️ Editar Bilhete';
+  document.getElementById('mb-data').value=b.data||'';
+  document.getElementById('mb-stake').value=b.stake||'';
+  document.getElementById('mb-err').style.display='none';
+  renderBilheteJogos();
+  openM('m-bilhete');
+}
+function addBilheteJogo(){
+  _mbJogos.push({mandante:'',visitante:'',mercado:'',odd:'',resultado:''});
+  renderBilheteJogos();
+}
+function removeBilheteJogo(i){
+  if(_mbJogos.length<=1)return;
+  _mbJogos.splice(i,1);
+  renderBilheteJogos();
+}
+function updateBilheteJogo(i,field,val){
+  _mbJogos[i][field]=val;
+  calcBilhetePreview();
+}
+function renderBilheteJogos(){
+  const cont=document.getElementById('mb-jogos-list');
+  if(!cont)return;
+  const resOpts=['Green','Red','Void','Pendente'].map(r=>`<option value="${r}">${r==='Green'?'✅ Green':r==='Red'?'❌ Red':r==='Void'?'⬜ Void':'⏳ Pendente'}</option>`).join('');
+  cont.innerHTML=_mbJogos.map((j,i)=>`
+    <div class="bilhete-jogo-item">
+      <div class="bilhete-jogo-num">Jogo ${i+1}</div>
+      ${_mbJogos.length>1?`<button class="bilhete-jogo-remove" onclick="removeBilheteJogo(${i})" title="Remover jogo">✕</button>`:''}
+      <div class="bilhete-jogo-grid">
+        <div class="fg"><label class="fl">Mandante</label><input class="fi" placeholder="Time mandante" value="${j.mandante||''}" oninput="updateBilheteJogo(${i},'mandante',this.value)"></div>
+        <div class="fg"><label class="fl">Visitante</label><input class="fi" placeholder="Time visitante" value="${j.visitante||''}" oninput="updateBilheteJogo(${i},'visitante',this.value)"></div>
+        <div class="fg"><label class="fl">Mercado</label><input class="fi" placeholder="Ex: Ambas Marcam" value="${j.mercado||''}" oninput="updateBilheteJogo(${i},'mercado',this.value)"></div>
+        <div class="fg"><label class="fl">Odd</label><input class="fi" type="number" step="0.01" min="1" placeholder="1.50" value="${j.odd||''}" oninput="updateBilheteJogo(${i},'odd',this.value)"></div>
+        <div class="fg" style="grid-column:1/-1"><label class="fl">Resultado</label>
+          <select class="fi" onchange="updateBilheteJogo(${i},'resultado',this.value)">
+            <option value="">— Pendente —</option>${resOpts.replace(`value="${j.resultado}"`,`value="${j.resultado}" selected`)}
+          </select>
+        </div>
+      </div>
+    </div>`).join('');
+  calcBilhetePreview();
+}
+function calcBilhetePreview(){
+  const oddTotal=calcOddTotal(_mbJogos);
+  const stake=parseFloat(document.getElementById('mb-stake')?.value)||0;
+  const otEl=document.getElementById('mb-odd-total');
+  if(otEl)otEl.textContent=oddTotal.toFixed(2);
+  const lucroWrap=document.getElementById('mb-lucro-wrap');
+  const lucroEl=document.getElementById('mb-lucro-prev');
+  if(stake>0&&lucroEl&&lucroWrap){
+    const lucro=(stake*oddTotal)-stake;
+    lucroEl.textContent='R$ '+lucro.toFixed(2);
+    lucroWrap.style.display='flex';
+  } else if(lucroWrap){lucroWrap.style.display='none';}
+}
+function salvarBilhete(){
+  const errEl=document.getElementById('mb-err');
+  const data=document.getElementById('mb-data').value;
+  const stake=document.getElementById('mb-stake').value;
+  if(!data||!stake){errEl.textContent='Data e Stake são obrigatórios.';errEl.style.display='block';return;}
+  if(_mbJogos.length===0){errEl.textContent='Adicione pelo menos 1 jogo.';errEl.style.display='block';return;}
+  errEl.style.display='none';
+  const all=loadMultiplas();
+  const bilhete={id:'b_'+Date.now(),data,stake:parseFloat(stake),jogos:JSON.parse(JSON.stringify(_mbJogos))};
+  if(_editBilheteIdx!==null){all[_editBilheteIdx]=bilhete;}else{all.push(bilhete);}
+  saveMultiplas(all);
+  closeM('m-bilhete');
+  renderMultiplas();
+  showToast(_editBilheteIdx!==null?'Bilhete atualizado! ✅':'Bilhete salvo! 🎫');
+}
+function excluirBilhete(idx){
+  const all=loadMultiplas();
+  all.splice(idx,1);
+  saveMultiplas(all);
+  renderMultiplas();
+  showToast('Bilhete removido!');
+}
+
+// ── PLANOS ───────────────────────────────────────────────────────────────────
+// TRIAL PERMISSIONS — edite aqui quando quiser definir o que o Trial pode/não pode
+const TRIAL_FEATURES = [
+  {text:'Acesso ao sistema completo', ok:true},
+  {text:'Registros de banca ilimitados', ok:true},
+  {text:'Calculadora de stake', ok:true},
+  {text:'Tabela de alavancagem', ok:true},
+  {text:'Metas financeiras', ok:true},
+  {text:'Controle de transações', ok:true},
+  // Adicione/remova itens conforme decidir as restrições do Trial
+  // {text:'Dashboard com gráficos', ok:false},
+  // {text:'Exportar dados', ok:false},
+];
+const PRO_FEATURES = [
+  {text:'Tudo do Trial, sem limites', ok:true},
+  {text:'Dashboard completo com gráficos', ok:true},
+  {text:'Múltiplas casas de apostas', ok:true},
+  {text:'Histórico e backup na nuvem', ok:true},
+  {text:'Exportar Excel e CSV', ok:true},
+  {text:'Relatórios detalhados', ok:true},
+  {text:'Suporte prioritário', ok:true},
+];
+function renderPlanoFeatures(){
+  function buildList(features, ulId){
+    const ul=document.getElementById(ulId);
+    if(!ul)return;
+    ul.innerHTML=features.map(f=>`
+      <li>
+        <span class="pf-icon ${f.ok?'yes':'no'}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="${f.ok?'#22C55E':'#D1D5DB'}" stroke-width="3">
+            ${f.ok?'<polyline points="20 6 9 17 4 12"/>':'<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>'}
+          </svg>
+        </span>
+        <span class="${f.ok?'':'pf-disabled'}">${f.text}</span>
+      </li>`).join('');
+  }
+  buildList(TRIAL_FEATURES,'trial-features');
+  buildList(PRO_FEATURES,'pro-features');
+}
+let planoCobranca='mensal';
+function setPlanoCobranca(tipo){
+  planoCobranca=tipo;
+  document.getElementById('ptbtn-mensal').classList.toggle('active',tipo==='mensal');
+  document.getElementById('ptbtn-anual').classList.toggle('active',tipo==='anual');
+  if(tipo==='mensal'){
+    document.getElementById('pro-plano-val').textContent='R$ 9,90';
+    document.getElementById('pro-plano-per').textContent='por mês';
+    document.getElementById('pro-plano-eco').textContent='';
+  } else {
+    document.getElementById('pro-plano-val').textContent='R$ 97';
+    document.getElementById('pro-plano-per').textContent='por ano';
+    document.getElementById('pro-plano-eco').textContent='✓ equivale a R$ 8,08/mês — economize 20%';
+  }
+}
+function assinarPro(){
+  showToast('Em breve! Entre em contato para assinar o Pro. 🚀');
+}
+function renderPlanos(){
+  renderPlanoFeatures();
+  setPlanoCobranca('mensal');
+}
 
 // ── RESPONSIVE SIDEBAR ───────────────────────────────────────────────────────
 function toggleSidebar(){
@@ -1371,6 +2335,7 @@ function initHomeDica(){
 // NAVIGATION
 // ══════════════════════════════════════════════
 function goPage(name,el){
+  localStorage.setItem('kt_lastpage',name);
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   if(el)el.classList.add('active');
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
@@ -1381,6 +2346,8 @@ function goPage(name,el){
   if(name==='transacoes')renderTransacoes();
   if(name==='alavancagem')calcAlav();
   if(name==='home')renderHome();
+  if(name==='entradas')renderEntradas();
+  if(name==='multiplas')renderMultiplas();
 }
 
 // ══════════════════════════════════════════════
@@ -1405,7 +2372,9 @@ function voltarMinhaConta(){
   buildCasaSelects();
   selPrf(S.perfil);
   setTimeout(initHomeDica,50);
-  goPage('home',document.getElementById('nav-home'));
+  const lastPage=localStorage.getItem('kt_lastpage')||'home';
+  const lastNav=document.getElementById('nav-'+lastPage);
+  goPage(lastPage,lastNav||document.getElementById('nav-home'));
 }
 
 // ══════════════════════════════════════════════
@@ -1527,9 +2496,13 @@ function selectAdminUser(email){
         <div style="font-size:12px;color:var(--text2)">Cadastrado em ${u.data||'-'}</div>
       </div>
     </div>
-    <div class="detail-field"><span class="detail-label">Tipo de conta</span><span class="badge ${u.role==='Master'?'badge-gold':u.role==='Admin'?'badge-blue':'badge-teal'}">${u.role}</span></div>
+    <div class="detail-field"><span class="detail-label">Nome</span><span class="detail-val">${u.name||'—'}</span></div>
+    <div class="detail-field"><span class="detail-label">Usuário</span><span class="detail-val">@${u.username||'—'}</span></div>
     <div class="detail-field"><span class="detail-label">Email</span><span class="detail-val">${u.email}</span></div>
-    <div class="detail-field"><span class="detail-label">Data de cadastro</span><span class="detail-val">${u.data||'-'}</span></div>
+    <div class="detail-field"><span class="detail-label">Telefone</span><span class="detail-val">${u.tel||'—'}</span></div>
+    <div class="detail-field"><span class="detail-label">Tipo de conta</span><span class="badge ${u.role==='Master'?'badge-gold':u.role==='Admin'?'badge-blue':'badge-teal'}">${u.role}</span></div>
+    <div class="detail-field"><span class="detail-label">Plano</span><span class="detail-val" style="background:${u.plano==='pro'?'var(--teal-light)':'var(--gold-bg)'};color:${u.plano==='pro'?'var(--teal)':'#92400E'};padding:2px 10px;border-radius:20px;font-size:11.5px;font-weight:700">${u.plano==='pro'?'⭐ Pro':'🆓 Trial'}</span></div>
+    <div class="detail-field"><span class="detail-label">Cadastro</span><span class="detail-val">${u.data||'—'}</span></div>
     <div class="detail-actions">
       <button class="btn btn-primary" style="justify-content:center" onclick="gerenciarComo('${u.email}')">⚙️ Gerenciar</button>
       <button class="btn btn-outline" style="justify-content:center" onclick="editarTipo('${u.email}')">✏️ Editar</button>
@@ -1539,8 +2512,52 @@ function selectAdminUser(email){
 }
 function editarTipo(email){
   const u=dbFind(email);if(!u)return;
-  const novo=prompt(`Tipo atual: ${u.role}\nDigite o novo tipo (Usuário, Admin):`,u.role);
-  if(novo&&['Usuário','Admin'].includes(novo)&&u.role!=='Master'){u.role=novo;saveDB();renderAdmin();showToast('Tipo atualizado!');}
+  S._editTarget=email;
+  document.getElementById('eu-nome').value=u.name||'';
+  document.getElementById('eu-email').value=u.email||'';
+  document.getElementById('eu-user').value=u.username||'';
+  document.getElementById('eu-tel').value=u.tel||'';
+  document.getElementById('eu-role').value=u.role||'Usuário';
+  // disable role if Master
+  document.getElementById('eu-role').disabled=(u.role==='Master');
+  document.getElementById('eu-plano').value=u.plano||'trial';
+  document.getElementById('eu-err').style.display='none';
+  openM('m-edit-user');
+}
+function salvarEditUser(){
+  const errEl=document.getElementById('eu-err');
+  const u=dbFind(S._editTarget);if(!u)return;
+  const nome=document.getElementById('eu-nome').value.trim();
+  const email=document.getElementById('eu-email').value.trim();
+  const username=document.getElementById('eu-user').value.trim();
+  const tel=document.getElementById('eu-tel').value.trim();
+  const role=document.getElementById('eu-role').value;
+  const plano=document.getElementById('eu-plano').value;
+  if(!nome||!email){errEl.textContent='Nome e email são obrigatórios.';errEl.style.display='block';return;}
+  // check email conflict (allow same email)
+  const conflict=DB.find(x=>x.email===email&&x.email!==S._editTarget);
+  if(conflict){errEl.textContent='Este email já está em uso por outro usuário.';errEl.style.display='block';return;}
+  // update
+  u.name=nome;
+  u.email=email;
+  u.username=username;
+  u.tel=tel;
+  if(u.role!=='Master')u.role=role;
+  u.plano=plano;
+  // if email changed, migrate udata
+  if(email!==S._editTarget){
+    const udata=localStorage.getItem('kt_udata');
+    if(udata){
+      const all=JSON.parse(udata);
+      if(all[S._editTarget]){all[email]=all[S._editTarget];delete all[S._editTarget];localStorage.setItem('kt_udata',JSON.stringify(all));}
+    }
+    const ses=localStorage.getItem('kt_session');
+    if(ses===S._editTarget)localStorage.setItem('kt_session',email);
+  }
+  saveDB();
+  closeM('m-edit-user');
+  renderAdmin();
+  showToast('Usuário atualizado com sucesso! ✅');
 }
 function abrirSenha(email){
   S._senhaTarget=email;
@@ -1597,7 +2614,8 @@ function doRegister(){
   if(pass!==conf){errEl.textContent='As senhas não conferem';errEl.style.display='block';return;}
   loadDB();
   if(dbFind(email)){errEl.textContent='Este email já está cadastrado';errEl.style.display='block';return;}
-  DB.push({email,role:'Usuário',name:nome,username:user,tel,pass,data:new Date().toLocaleDateString('pt-BR')});
+  const planoSel=document.querySelector('input[name="r-plano"]:checked')?.value||'trial';
+  DB.push({email,role:'Usuário',plano:planoSel,name:nome,username:user,tel,pass,data:new Date().toLocaleDateString('pt-BR')});
   saveDB();
   showToast('Conta criada! Faça login. 🎉');
   // clear form
