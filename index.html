@@ -614,7 +614,7 @@ tr.row-new{background:#f0fdf9}
         <button class="btn-login" onclick="doLogin()">Entrar →</button>
         <div class="login-err" id="l-err">Email ou senha incorretos</div>
       </div>
-      <div class="login-hint">👤 <strong>Conta de teste:</strong> teste1&#64;gmail.com / 123456</div>
+  
     </div>
 
     <!-- REGISTER FORM -->
@@ -1130,7 +1130,11 @@ tr.row-new{background:#f0fdf9}
             <div class="banca-info-val green" id="g-banca-atual">R$ 0,00</div>
           </div>
         </div>
-        <button class="btn btn-primary" style="margin-left:auto" onclick="adicionarLinhaGestao()">+ Adicionar linha</button>
+        <button class="btn btn-outline" onclick="recalcularTabela()" title="Recalcula o Inicial de cada linha em cadeia a partir da banca inicial" style="gap:7px">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+          Recalcular tabela
+        </button>
+        <button class="btn btn-primary" style="margin-left:4px" onclick="adicionarLinhaGestao()">+ Adicionar linha</button>
       </div>
       <div class="table-wrap">
         <div style="overflow-x:auto" id="gestao-table-wrap"><table id="gestao-table"><thead><tr><th>Data</th><th>Inicial</th><th>Depósito</th><th>Saque</th><th>Resultado</th><th style="color:var(--teal);white-space:nowrap">% Banca</th><th style="color:var(--text)">Final</th><th>Ações</th></tr></thead><tbody id="gestao-body"></tbody></table></div>
@@ -1690,7 +1694,7 @@ function loadDB(){
   const saved=localStorage.getItem('kt_db');
   const defaults=[
     {email:'kamaelcontatos@gmail.com',role:'Master',name:'Kamaelzinho'},
-    {email:'teste1@gmail.com',role:'Usuário',name:'Teste'},
+    {email:'teste1@gmail.com',role:'Usuário',name:'João Demo',username:'joaodemo',tel:'(11) 98765-4321',plano:'pro',data:'01/03/2026'},
   ];
   let passMap={};
   try{passMap=JSON.parse(localStorage.getItem('kt_passes')||'{}')}catch(e){}
@@ -1722,6 +1726,7 @@ function saveUD(){
   });
 }
 function loadUD(email){
+  if(email==='teste1@gmail.com')seedDemoData();
   const d=getUD(email);
   S.bancaInicial=d.bancaInicial||{};S.casaOutro=d.casaOutro||'';
   S.banca=d.banca||{};
@@ -1731,6 +1736,102 @@ function loadUD(email){
   S.perfil=d.perfil||'c';
   S.casaAtiva=d.casaAtiva||'';
   S.gestaoC=S.casaAtiva;
+}
+
+
+// ══════════════════════════════════════════════
+// DEMO DATA SEED
+// ══════════════════════════════════════════════
+function seedDemoData(){
+  const email='teste1@gmail.com';
+  const KEY_SEEDED='kt_demo_seeded_v3';
+  if(localStorage.getItem(KEY_SEEDED))return;
+
+  // ── Gestão de banca (Betano) ──────────────────
+  const ud=getUD(email);
+  ud.casaAtiva='Betano';
+  ud.bancaInicial={'Betano':500};
+  ud.banca={'Betano':632};
+  const hoje=new Date();
+  function fmtDate(d){return d.toISOString().split('T')[0];}
+  function daysAgo(n){const d=new Date(hoje);d.setDate(d.getDate()-n);return fmtDate(d);}
+  ud.registros={'Betano':[
+    {id:1001,data:daysAgo(20),inicial:500,deposito:0,saque:0,resultado:50,final:550},
+    {id:1002,data:daysAgo(15),inicial:550,deposito:0,saque:0,resultado:-30,final:520},
+    {id:1003,data:daysAgo(10),inicial:520,deposito:50,saque:0,resultado:80,final:650},
+    {id:1004,data:daysAgo(5), inicial:650,deposito:0,saque:50,resultado:32,final:632},
+    {id:1005,data:daysAgo(1), inicial:632,deposito:0,saque:0,resultado:0,final:632},
+  ]};
+  ud.perfil='m';
+
+  // ── Metas ─────────────────────────────────────
+  ud.metas=[
+    {id:'m1',titulo:'Banca R$ 1.000',icone:'🎯',alvo:1000,atual:632,prazo:fmtDate(new Date(hoje.getFullYear(),hoje.getMonth()+2,1)),concluida:false,historico:[
+      {data:daysAgo(20),valor:50,obs:'Primeiro lucro'},
+      {data:daysAgo(10),valor:82,obs:'Semana boa'},
+    ]},
+    {id:'m2',titulo:'Saque de R$ 200',icone:'💰',alvo:200,atual:200,prazo:daysAgo(-5),concluida:true,historico:[
+      {data:daysAgo(5),valor:200,obs:'Meta atingida!'},
+    ]},
+    {id:'m3',titulo:'30 dias positivos',icone:'📈',alvo:30,atual:18,prazo:fmtDate(new Date(hoje.getFullYear(),hoje.getMonth()+1,1)),concluida:false,historico:[]},
+  ];
+
+  // ── Transações ────────────────────────────────
+  ud.transacoes=[
+    {id:'t1',data:daysAgo(22),tipo:'Depósito',valor:500,casa:'Betano',metodo:'PIX',status:'Concluído',obs:'Aporte inicial'},
+    {id:'t2',data:daysAgo(10),tipo:'Depósito',valor:50,casa:'Betano',metodo:'PIX',status:'Concluído',obs:'Recarga'},
+    {id:'t3',data:daysAgo(5),tipo:'Saque',valor:50,casa:'Betano',metodo:'PIX',status:'Concluído',obs:'Retirada parcial'},
+    {id:'t4',data:daysAgo(2),tipo:'Bônus',valor:25,casa:'Betano',metodo:'Outro',status:'Concluído',obs:'Bônus de recarga'},
+    {id:'t5',data:daysAgo(0),tipo:'Saque',valor:100,casa:'Betano',metodo:'PIX',status:'Pendente',obs:''},
+  ];
+
+  setUD(email, ud);
+  // Force S to load the seeded data if this is the active user
+  // (so saveUD won't overwrite with empty S)
+
+  // ── Controle de Entradas Simples ──────────────
+  const CENT_KEY='kt_entradas_'+email;
+  const m=String(hoje.getFullYear())+'-'+String(hoje.getMonth()+1).padStart(2,'0');
+  const entradas=[
+    {id:'e1',data:m+'-01',campeonato:'Brasileirão Série A',mandante:'Flamengo',visitante:'Palmeiras',estrategia:'Lay Favorito',odd:1.80,stake:30,resultado:'Green'},
+    {id:'e2',data:m+'-03',campeonato:'Champions League',mandante:'Real Madrid',visitante:'Man City',estrategia:'Gols +2.5',odd:2.10,stake:20,resultado:'Green'},
+    {id:'e3',data:m+'-05',campeonato:'Brasileirão Série A',mandante:'Fluminense',visitante:'Corinthians',estrategia:'Ambas Marcam',odd:1.95,stake:25,resultado:'Red'},
+    {id:'e4',data:m+'-07',campeonato:'Premier League',mandante:'Arsenal',visitante:'Chelsea',estrategia:'Handicap Asiático',odd:1.75,stake:30,resultado:'Green'},
+    {id:'e5',data:m+'-09',campeonato:'La Liga',mandante:'Barcelona',visitante:'Atlético Madrid',estrategia:'Empate com Volta',odd:2.30,stake:20,resultado:'Void'},
+  ];
+  localStorage.setItem(CENT_KEY, JSON.stringify(entradas));
+
+  // ── Múltiplas ─────────────────────────────────
+  const MULT_KEY='kt_multiplas_'+email;
+  const multiplas=[
+    {id:'b1',data:m+'-02',stake:20,jogos:[
+      {mandante:'Flamengo',visitante:'São Paulo',mercado:'Vitória Mandante',odd:1.70,resultado:'Green'},
+      {mandante:'Liverpool',visitante:'Arsenal',mercado:'Ambas Marcam',odd:1.85,resultado:'Green'},
+      {mandante:'Real Madrid',visitante:'Sevilla',mercado:'Gols +2.5',odd:1.60,resultado:'Green'},
+    ]},
+    {id:'b2',data:m+'-04',stake:15,jogos:[
+      {mandante:'Palmeiras',visitante:'Grêmio',mercado:'Vitória Mandante',odd:1.55,resultado:'Green'},
+      {mandante:'PSG',visitante:'Lyon',mercado:'Ambas Marcam',odd:1.90,resultado:'Red'},
+    ]},
+    {id:'b3',data:m+'-06',stake:25,jogos:[
+      {mandante:'Corinthians',visitante:'Santos',mercado:'Empate',odd:3.20,resultado:'Green'},
+      {mandante:'Bayern',visitante:'Dortmund',mercado:'Gols +3.5',odd:2.10,resultado:'Green'},
+      {mandante:'Inter Milan',visitante:'Juventus',mercado:'Vitória Mandante',odd:1.95,resultado:'Void'},
+      {mandante:'Benfica',visitante:'Porto',mercado:'Vitória Visitante',odd:2.40,resultado:'Green'},
+    ]},
+    {id:'b4',data:m+'-08',stake:10,jogos:[
+      {mandante:'Fluminense',visitante:'Botafogo',mercado:'Ambas Marcam',odd:1.80,resultado:'Green'},
+      {mandante:'Chelsea',visitante:'Man United',mercado:'Gols +2.5',odd:1.75,resultado:'Pendente'},
+    ]},
+    {id:'b5',data:m+'-10',stake:30,jogos:[
+      {mandante:'Athletico PR',visitante:'Atlético MG',mercado:'Lay 0x0',odd:1.65,resultado:'Green'},
+      {mandante:'Napoli',visitante:'Roma',mercado:'Vitória Mandante',odd:1.70,resultado:'Green'},
+      {mandante:'Ajax',visitante:'PSV',mercado:'Ambas Marcam',odd:1.90,resultado:'Green'},
+    ]},
+  ];
+  localStorage.setItem(MULT_KEY, JSON.stringify(multiplas));
+
+  localStorage.setItem(KEY_SEEDED,'1');
 }
 
 // ══════════════════════════════════════════════
@@ -2804,6 +2905,27 @@ function salvarEdicaoGestao(id){
   // recalculate banca from scratch
   recalcBanca(c);
   saveUD();renderGestao();showToast('Linha atualizada! ✅');
+}
+
+
+function recalcularTabela(){
+  const c=S.gestaoC;
+  const regs=S.registros[c]||[];
+  if(!regs.length){showToast('Nenhum registro para recalcular.');return;}
+  let prev=S.bancaInicial[c]||0;
+  regs.forEach((r,i)=>{
+    r.inicial=parseFloat(prev.toFixed(2));
+    const dep=parseFloat(r.deposito)||0;
+    const saq=parseFloat(r.saque)||0;
+    const res=parseFloat(r.resultado)||0;
+    r.final=parseFloat((prev+dep-saq+res).toFixed(2));
+    prev=r.final;
+  });
+  S.registros[c]=regs;
+  recalcBanca(c);
+  saveUD();
+  renderGestao();
+  showToast('Tabela recalculada com sucesso! ✅');
 }
 
 function recalcBanca(c){
