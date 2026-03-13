@@ -821,6 +821,14 @@ tr.row-new{background:#f0fdf9}
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
             Gestão Gerenciada
           </div>
+          <div class="nav-item" onclick="goPage('histsaques',this)" id="nav-histsaques">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+            Histórico de Saques
+          </div>
+          <div class="nav-item" onclick="goPage('contratos',this)" id="nav-contratos">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            Contratos
+          </div>
         </div>
       </div>
 
@@ -1129,6 +1137,36 @@ tr.row-new{background:#f0fdf9}
         </div>
       </div>
       <div id="gg-container"></div>
+    </div>
+
+    <!-- HISTÓRICO DE SAQUES -->
+
+    <div class="page" id="page-contratos">
+      <div class="page-header">
+        <div>
+          <div class="page-title" style="display:flex;align-items:center;gap:8px">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            Contratos
+          </div>
+          <div class="page-sub">Gestão de contratos de banca gerenciada</div>
+        </div>
+      </div>
+      <div class="page-body">
+        <div id="contratos-container"></div>
+      </div>
+    </div>
+
+    <div class="page" id="page-histsaques">
+      <div class="page-header">
+        <div>
+          <div class="page-title" style="display:flex;align-items:center;gap:8px">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+            Histórico de Saques
+          </div>
+          <div class="page-sub">Todos os saques registrados na gestão gerenciada</div>
+        </div>
+      </div>
+      <div id="hs-container"></div>
     </div>
 
     <!-- LOG DO SISTEMA -->
@@ -1597,6 +1635,17 @@ tr.row-new{background:#f0fdf9}
           <button class="plano-cta plano-cta-pro" onclick="assinarPro()">Assinar Pro →</button>
         </div>
 
+      </div>
+
+      <!-- Código de acesso -->
+      <div id="plano-codigo-box" style="max-width:480px;margin:24px auto 0;background:var(--white);border:1px solid var(--border);border-radius:var(--radius2);padding:20px 24px">
+        <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px">🎟️ Tenho um código de acesso</div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:12px">Insira o código para ativar o plano Pro gratuitamente</div>
+        <div id="codigo-acesso-err" style="display:none;color:#DC2626;font-size:12px;margin-bottom:10px;background:#FEF2F2;padding:7px 10px;border-radius:8px"></div>
+        <div style="display:flex;gap:8px">
+          <input class="fi" id="codigo-acesso-input" type="text" placeholder="Ex: KAMAEL2026" style="margin:0;flex:1;text-transform:uppercase;font-weight:700;letter-spacing:1px" oninput="this.value=this.value.toUpperCase()">
+          <button class="btn btn-primary" style="flex-shrink:0;padding:10px 18px" onclick="ativarCodigo()">Ativar</button>
+        </div>
       </div>
 
 
@@ -3496,6 +3545,52 @@ function setPlanoCobranca(tipo){
   if(valEl)valEl.textContent='R$ 19,90';
   if(perEl)perEl.textContent='por mês';
 }
+
+const CODIGOS_ACESSO = {
+  'KAMAEL2026':  {plano:'Pro Mensal', meses:1, descricao:'Acesso Pro por 1 mês'},
+  'TESTEPRO':    {plano:'Pro Mensal', meses:1, descricao:'Acesso Pro por 1 mês'},
+  'KAMAELBETA':  {plano:'Pro Mensal', meses:3, descricao:'Acesso Pro por 3 meses'},
+};
+
+function ativarCodigo(){
+  const input=document.getElementById('codigo-acesso-input');
+  const errEl=document.getElementById('codigo-acesso-err');
+  const code=(input?.value||'').trim().toUpperCase();
+  errEl.style.display='none';
+
+  if(!code){errEl.textContent='Digite um código.';errEl.style.display='block';return;}
+
+  const promo=CODIGOS_ACESSO[code];
+  if(!promo){errEl.textContent='Código inválido ou expirado.';errEl.style.display='block';return;}
+
+  const u=S.loggedUser;
+  if(!u){return;}
+  if(u.role==='Master'||u.role==='Admin'){
+    errEl.textContent='Contas administrativas já têm acesso total.';
+    errEl.style.display='block';return;
+  }
+
+  // Check if already pro
+  const p=getUserPaymentStatus(u.email);
+  if(p.plano==='Pro Mensal'&&p.status==='Ativo'){
+    errEl.textContent='Você já possui o plano Pro ativo!';
+    errEl.style.display='block';return;
+  }
+
+  // Apply
+  const d=new Date();
+  d.setMonth(d.getMonth()+promo.meses);
+  const venc=d.toISOString().split('T')[0];
+  const all=getPagData();
+  all[u.email]={...(all[u.email]||{}),plano:'Pro Mensal',status:'Ativo',vencimento:venc,valor:0,forma:'Código Promocional',obs:'Código: '+code};
+  savePagData(all);
+  logAction('sistema','Plano ativado via código','Email: '+u.email+' | Código: '+code+' | '+promo.descricao);
+  applyNavLocks();
+  renderPlanos();
+  input.value='';
+  showToast('🎉 Plano Pro ativado! Válido até '+new Date(venc+'T12:00:00').toLocaleDateString('pt-BR'));
+}
+
 function assinarPro(){
   showToast('Em breve! Entre em contato para assinar o Pro. 🚀');
 }
@@ -3513,6 +3608,8 @@ function renderPlanos(){
     if(adminCard)adminCard.style.display='block';
     if(normalCards)normalCards.style.display='none';
     if(banner)banner.style.display='none';
+    const codigoBox=document.getElementById('plano-codigo-box');
+    if(codigoBox)codigoBox.style.display='none';
   } else {
     if(adminCard)adminCard.style.display='none';
     if(normalCards)normalCards.style.display='flex';
@@ -3528,6 +3625,8 @@ function renderPlanos(){
       }
       banner.style.display='flex';
     }
+    const codigoBox=document.getElementById('plano-codigo-box');
+    if(codigoBox)codigoBox.style.display=(p.plano==='Pro Mensal'&&p.status==='Ativo')?'none':'block';
     renderPlanoFeatures();
     setPlanoCobranca('mensal');
     // Mark current plan card
@@ -3719,7 +3818,9 @@ function openNavGroupFor(pageName){
     'alavancagem':'ng-operacional','calculadora':'ng-operacional','simbanca':'ng-operacional','dicas':'ng-operacional',
     'gestao':'ng-gestao','entradas':'ng-gestao','criaraposta':'ng-gestao','multiplas':'ng-gestao','metas':'ng-gestao',
     'transacoes':'ng-financeiro',
-    'gestaogerenciada':'ng-financeiro'
+    'gestaogerenciada':'ng-financeiro',
+    'histsaques':'ng-financeiro',
+    'contratos':'ng-financeiro'
   };
   const gId=groupMap[pageName];
   if(gId){
@@ -3767,12 +3868,17 @@ function goPage(name,el){
   if(name==='criaraposta')renderCriarAposta();
   if(name==='simbanca')renderSimBanca();
   if(name==='planos')renderPlanos();
+  if(name==='histsaques')renderHistSaques();
+  if(name==='contratos')renderContratos();
   if(name==='gestaogerenciada'){
     renderGestaoGerenciada();
     setTimeout(()=>{
       const allGG=getGGData();
       Object.keys(allGG).forEach(email=>{
-        if(document.getElementById('gg-hist-'+email))renderGGHistorico(email);
+        if(document.getElementById('gg-hist-'+email)){
+          const tab=_ggActiveTab[email]||'historico';
+          setGGTab(email,tab);
+        }
       });
     },50);
   }
@@ -4014,8 +4120,9 @@ function renderPagamentos(){
     const st=PAG_STATUS_STYLE[p.status]||PAG_STATUS_STYLE['Trial'];
     const pl=PAG_PLANO_STYLE[p.plano]||PAG_PLANO_STYLE['Trial'];
     const formaIcon=FORMA_ICONS[p.forma]||'—';
+    const isPromo=p.forma==='Código Promocional';
     const vencFmt=p.vencimento?new Date(p.vencimento+'T12:00:00').toLocaleDateString('pt-BR'):'—';
-    const rowBg=p.status==='Atrasado'?'background:#FFF8F8;':'';
+    const rowBg=p.status==='Atrasado'?'background:#FFF8F8;':isPromo?'background:#F5F3FF;':'';
     return `<tr style="${rowBg}">
       <td>
         <div style="font-weight:600;color:var(--text)">${u.nome||u.name||u.email}</div>
@@ -4025,7 +4132,14 @@ function renderPagamentos(){
       <td><span style="font-size:12px;font-weight:700;color:var(--text2)">${u.role}</span></td>
       <td><span style="background:${pl.bg};color:${pl.color};font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap">${p.plano}</span></td>
       <td style="font-weight:700;color:var(--teal)">${p.valor?'R$ '+parseFloat(p.valor).toFixed(2):'—'}</td>
-      <td style="font-size:13px">${formaIcon} ${p.forma||'—'}</td>
+      <td style="font-size:13px">
+        ${isPromo
+          ?`<div style="display:flex;flex-direction:column;gap:3px">
+              <span style="background:#EDE9FE;color:#7C3AED;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;display:inline-block;white-space:nowrap">🎟️ Código Promo</span>
+              <span style="font-size:10px;color:#7C3AED;font-weight:600">${p.obs||''}</span>
+            </div>`
+          :`${formaIcon} ${p.forma||'—'}`}
+      </td>
       <td style="font-size:13px;color:${p.vencimento&&new Date(p.vencimento)<new Date()&&p.status!=='Cancelado'?'#DC2626':'var(--text)'}">${vencFmt}</td>
       <td><span style="background:${st.bg};color:${st.color};font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;white-space:nowrap">${p.status}</span></td>
       <td>
@@ -4400,6 +4514,9 @@ function criarNovoUsuarioHome(){
 // ── GESTÃO GERENCIADA ─────────────────────────────────────────────────────────
 function getGGData(){try{return JSON.parse(localStorage.getItem('kt_gg')||'{}')}catch{return {}}}
 function saveGGData(d){localStorage.setItem('kt_gg',JSON.stringify(d))}
+
+function limparHistoricoAtualizacoesGG(){ /* disabled — historico restored */ }
+
 function getGGUser(email){
   const all=getGGData();
   return all[email]||{status:'inativo',comissao:10,bancaInicial:0,saques:[],contratadoEm:null};
@@ -4439,6 +4556,20 @@ function ativarGestaoUser(email){
   showToast('Gestão ativada para '+email+' ✅');
 }
 
+function reativarGestaoUser(email){
+  confirmAction('Reativar gestão gerenciada de '+email+'?', ()=>{
+    const all=getGGData();
+    if(!all[email])return;
+    all[email].status='ativo';
+    all[email].reativadoEm=new Date().toISOString().split('T')[0];
+    delete all[email].encerradoEm;
+    saveGGData(all);
+    logAction('gestao','Gestão reativada','Email: '+email);
+    renderGestaoGerenciada();
+    showToast('Gestão reativada ✅');
+  }, 'Reativar');
+}
+
 function encerrarGestaoUser(email){
   confirmAction('Encerrar gestão gerenciada de '+email+'?', ()=>{
     const all=getGGData();
@@ -4472,27 +4603,62 @@ function registrarSaqueGG(email){
   showToast('Saque registrado! Comissão: R$ '+comissao.toFixed(2)+' ✅');
 }
 
-function atualizarBancaGG(email){
-  const val=parseFloat(document.getElementById('gg-banca-edit-'+email)?.value||0);
-  if(isNaN(val)||val<0){showToast('Valor inválido ❌');return;}
+function abrirModalAtualizarBanca(email){
+  const _ggD=getGGUser(email);
+  const _minDate=_ggD.contratadoEm||_ggD.ativadoEm||'';
+  document.getElementById('gg-upd-email').value=email;
+  const _dataInput=document.getElementById('gg-upd-data');
+  _dataInput.value=new Date().toISOString().split('T')[0];
+  if(_minDate) _dataInput.min=_minDate;
+  else _dataInput.removeAttribute('min');
+  document.getElementById('gg-upd-valor').value='';
+  document.getElementById('gg-upd-obs').value='';
+  document.getElementById('gg-upd-err').style.display='none';
+  // Show banca atual
+  const d=getGGUser(email);
+  const ups=(d.historico||[]).filter(h=>h.tipo==='atualizacao').sort((a,b)=>a.data.localeCompare(b.data));
+  const bancaAtual=ups.length>0?ups[ups.length-1].bancaPos:(d.bancaAtual||d.bancaInicial||0);
+  document.getElementById('gg-upd-banca-atual').textContent='R$ '+bancaAtual.toFixed(2);
+  openM('m-gg-upd-banca');
+}
+
+function salvarAtualizacaoBancaGG(){
+  const email=document.getElementById('gg-upd-email').value;
+  const data=document.getElementById('gg-upd-data').value;
+  const val=parseFloat(document.getElementById('gg-upd-valor').value||0);
+  const obs=document.getElementById('gg-upd-obs').value.trim();
+  const errEl=document.getElementById('gg-upd-err');
+  if(!data){errEl.textContent='Informe a data.';errEl.style.display='block';return;}
+  if(isNaN(val)||val<0){errEl.textContent='Informe um valor válido.';errEl.style.display='block';return;}
   const all=getGGData();
-  if(!all[email])return;
-  const old=all[email].bancaAtual;
-  all[email].bancaAtual=val;
-  all[email].historico=all[email].historico||[];
-  const variacao=parseFloat((val-old).toFixed(2));
-  all[email].historico.push({
-    data:new Date().toISOString().split('T')[0],
+  const u=all[email]; if(!u)return;
+  const dataInicio=u.contratadoEm||u.ativadoEm||'';
+  if(dataInicio&&data<dataInicio){
+    errEl.innerHTML='❌ Data anterior ao início da gestão (<strong>'+new Date(dataInicio+'T12:00:00').toLocaleDateString('pt-BR')+'</strong>).<br>Não é permitido registrar antes da data de início da gestão.';
+    errEl.style.display='block';
+    return;
+  }
+  const old=u.bancaAtual||u.bancaInicial||0;
+  u.historico=u.historico||[];
+  u.historico.push({
+    id:'hist_'+Date.now(),
+    data,
     tipo:'atualizacao',
     bancaAntes:old,
     bancaPos:val,
-    variacao
+    variacao:0, // recadear vai recalcular
+    obs:obs||undefined
   });
+  recadearHistoricoGG(u);
   saveGGData(all);
+  closeM('m-gg-upd-banca');
   renderGestaoGerenciada();
   setTimeout(()=>renderGGHistorico(email),50);
+  logAction('gestao','Banca atualizada na gestão gerenciada','Email: '+email+' | Banca: R$ '+val+(obs?' | Obs: '+obs:''));
   showToast('Banca atualizada ✅');
 }
+
+function atualizarBancaGG(email){ abrirModalAtualizarBanca(email); }
 
 function toggleComissaoPagaSaque(email, saqueId){
   const all=getGGData();
@@ -4522,6 +4688,8 @@ function editarSaqueGG(email, saqueId){
   document.getElementById('gg-edit-saque-comissao').value=saque.comissao;
   document.getElementById('gg-edit-saque-liquido').value=saque.liquido;
   document.getElementById('gg-edit-err').style.display='none';
+  // Store caller context for post-save refresh
+  window._ggEditCaller = document.getElementById('page-histsaques')?.style.display!=='none' ? 'histsaques' : 'gestaogerenciada';
   openM('m-gg-edit-saque');
 }
 
@@ -4546,19 +4714,23 @@ function salvarEdicaoSaqueGG(){
   u.comissaoPendente=parseFloat((u.saques||[]).filter(s=>!s.comissaoPaga).reduce((sum,s)=>sum+s.comissao,0).toFixed(2));
   saveGGData(all);
   closeM('m-gg-edit-saque');
-  renderGestaoGerenciada();
-  setTimeout(()=>renderGGHistorico(email),50);
+  if(window._ggEditCaller==='histsaques'){
+    renderHistSaques();
+    refreshGGCards();
+  } else {
+    renderGestaoGerenciada();
+    setTimeout(()=>renderGGHistorico(email),50);
+  }
   showToast('Saque atualizado ✅');
 }
 
 function removerSaqueGG(email, saqueId){
   confirmAction('Remover este saque do histórico?', ()=>{
     const all=getGGData(); const u=all[email]; if(!u)return;
-    const saque=(u.saques||[]).find(s=>s.id===saqueId);
-    if(saque){u.bancaAtual=parseFloat((u.bancaAtual+saque.valor).toFixed(2));}
     u.saques=(u.saques||[]).filter(s=>s.id!==saqueId);
     u.comissaoPaga=parseFloat((u.saques||[]).filter(s=>s.comissaoPaga).reduce((sum,s)=>sum+s.comissao,0).toFixed(2));
     u.comissaoPendente=parseFloat((u.saques||[]).filter(s=>!s.comissaoPaga).reduce((sum,s)=>sum+s.comissao,0).toFixed(2));
+    recalcularBancaGG(u);
     saveGGData(all);
     renderGestaoGerenciada();
     setTimeout(()=>renderGGHistorico(email),50);
@@ -4578,6 +4750,82 @@ function editarAtualizacaoGG(email, idx){
   openM('m-gg-edit-hist');
 }
 
+function salvarEdicaoHistGGLegacy(){}  // kept for compat
+
+
+
+const _ggActiveTab={};
+
+function setGGTab(email, tab){
+  _ggActiveTab[email]='historico'; // always historico now
+  const histPanel=document.getElementById('gg-panel-historico-'+email);
+  if(!histPanel)return;
+  const saqPanel=document.getElementById('gg-panel-saques-'+email);
+  if(saqPanel)saqPanel.style.display='none';
+  histPanel.style.display='block';
+  const histBtn=document.getElementById('gg-tab-hist-'+email);
+  if(histBtn){histBtn.style.background='var(--teal)';histBtn.style.color='#fff';histBtn.style.borderColor='var(--teal)';}
+  renderGGHistorico(email);
+}
+
+function setComissaoPagaStatus(email, saqueId, val){
+  const all=getGGData();
+  const u=all[email]; if(!u)return;
+  const saque=(u.saques||[]).find(s=>s.id===saqueId);
+  if(!saque)return;
+  saque.comissaoPaga=(val==='pago');
+  saque.comissaoStatus=val;
+  u.comissaoPaga=parseFloat((u.saques||[]).filter(s=>s.comissaoPaga).reduce((sum,s)=>sum+s.comissao,0).toFixed(2));
+  u.comissaoPendente=parseFloat((u.saques||[]).filter(s=>!s.comissaoPaga).reduce((sum,s)=>sum+s.comissao,0).toFixed(2));
+  saveGGData(all);
+  refreshGGCards();
+  renderGestaoGerenciada();
+  setTimeout(()=>{
+    setGGTab(email,_ggActiveTab[email]||'saques');
+  },50);
+  showToast(val==='pago'?'Comissão marcada como paga ✅':'Comissão marcada como pendente ⏳');
+}
+
+
+function refreshGGCards(){
+  const allGG=getGGData();
+  const entries=Object.entries(allGG);
+  const totalComPendente=entries.reduce((s,[,d])=>s+((d.saques||[]).filter(sk=>!sk.comissaoPaga&&sk.comissaoStatus!=='cancelado').reduce((a,sk)=>a+sk.comissao,0)),0);
+  const totalComRecebida=entries.reduce((s,[,d])=>s+((d.saques||[]).filter(sk=>sk.comissaoPaga||sk.comissaoStatus==='pago').reduce((a,sk)=>a+sk.comissao,0)),0);
+  // Top summary cards
+  const elP=document.getElementById('gg-val-pendente');
+  const elR=document.getElementById('gg-val-recebida');
+  if(elP)elP.textContent='R$ '+totalComPendente.toFixed(2);
+  if(elR)elR.textContent='R$ '+totalComRecebida.toFixed(2);
+  // Per-client cards
+  entries.forEach(([email,d])=>{
+    const el=document.getElementById('gg-client-card-compend-'+email);
+    if(!el)return;
+    const _isPago=s=>s.comissaoStatus==='pago'||(s.comissaoPaga===true&&s.comissaoStatus!=='cancelado'&&s.comissaoStatus!=='pendente');
+    const pend=parseFloat(((d.saques||[]).filter(s=>!_isPago(s)&&s.comissaoStatus!=='cancelado').reduce((a,s)=>a+s.comissao,0)).toFixed(2));
+    const rec=parseFloat(((d.saques||[]).filter(_isPago).reduce((a,s)=>a+s.comissao,0)).toFixed(2));
+    el.innerHTML=`<div style="font-size:11px;color:var(--text2);font-weight:700;margin-bottom:2px">COM. PEND.</div>
+      <div style="font-weight:800;font-size:13px;color:#DC2626">${pend>0?'R$ '+pend.toFixed(2):'—'}</div>
+      <div style="font-size:10px;color:var(--green-text);font-weight:600;margin-top:2px">${rec>0?'✅ R$ '+rec.toFixed(2)+' recebida':''}</div>`;
+  });
+}
+
+function forcarRecalcGG(email){
+  const all=getGGData(); const u=all[email]; if(!u)return;
+  recalcularBancaGG(u);
+  saveGGData(all);
+  renderGestaoGerenciada();
+  setTimeout(()=>renderGGHistorico(email),50);
+  showToast('Banca recalculada ✅');
+}
+
+function recalcularBancaGG(u){
+  recadearHistoricoGG(u);
+  u.comissaoPaga=parseFloat((u.saques||[]).filter(s=>s.comissaoPaga).reduce((sum,s)=>sum+s.comissao,0).toFixed(2));
+  u.comissaoPendente=parseFloat((u.saques||[]).filter(s=>!s.comissaoPaga).reduce((sum,s)=>sum+s.comissao,0).toFixed(2));
+  return u;
+}
+
 function salvarEdicaoHistGG(){
   const email=document.getElementById('gg-edit-hist-email').value;
   const idx=parseInt(document.getElementById('gg-edit-hist-idx').value);
@@ -4588,26 +4836,36 @@ function salvarEdicaoHistGG(){
   const all=getGGData(); const u=all[email]; if(!u)return;
   const entry=u.historico[idx]; if(!entry)return;
   entry.data=data;
-  entry.bancaAntes=entry.bancaAntes; // keep
   entry.bancaPos=bancaPos;
-  entry.variacao=parseFloat((bancaPos-entry.bancaAntes).toFixed(2));
-  // update banca atual to latest historico entry if this is the last one
-  const latestHist=[...u.historico].filter(h=>h.tipo==='atualizacao').sort((a,b)=>b.data.localeCompare(a.data))[0];
-  if(latestHist&&latestHist===entry) u.bancaAtual=bancaPos;
+  // Recadear todo o histórico em ordem cronológica
+  recadearHistoricoGG(u);
   saveGGData(all);
   closeM('m-gg-edit-hist');
   renderGestaoGerenciada();
   setTimeout(()=>renderGGHistorico(email),50);
-  showToast('Atualização editada ✅');
+  showToast('Banca recalculada e salva ✅');
+}
+
+function recadearHistoricoGG(u){
+  // Ordena por data (e id como desempate)
+  const updates=(u.historico||[])
+    .filter(h=>h.tipo==='atualizacao')
+    .sort((a,b)=>a.data.localeCompare(b.data)||(a.id||'').localeCompare(b.id||''));
+  // Recalcula bancaAntes e variacao em cadeia
+  for(let i=0;i<updates.length;i++){
+    updates[i].bancaAntes=i===0?(u.bancaInicial||0):updates[i-1].bancaPos;
+    updates[i].variacao=parseFloat((updates[i].bancaPos-updates[i].bancaAntes).toFixed(2));
+  }
+  // bancaAtual = ultimo bancaPos
+  if(updates.length>0) u.bancaAtual=updates[updates.length-1].bancaPos;
+  else u.bancaAtual=u.bancaInicial||0;
 }
 
 function removerAtualizacaoGG(email, idx){
   confirmAction('Remover este registro de banca?', ()=>{
     const all=getGGData(); const u=all[email]; if(!u)return;
-    u.historico.splice(idx,1);
-    // recalc bancaAtual from last update
-    const updates=u.historico.filter(h=>h.tipo==='atualizacao').sort((a,b)=>b.data.localeCompare(a.data));
-    if(updates.length>0)u.bancaAtual=updates[0].bancaPos;
+    u.historico=(u.historico||[]).filter((_,i)=>i!==idx);
+    recalcularBancaGG(u);
     saveGGData(all);
     renderGestaoGerenciada();
     setTimeout(()=>renderGGHistorico(email),50);
@@ -4636,17 +4894,44 @@ function renderGestaoGerenciada(){
     // Admin view — all users with gestão
     const allGG=getGGData();
     const entries=Object.entries(allGG);
-    const totalComPendente=entries.reduce((s,[,d])=>s+(d.comissaoPendente||0),0);
     const totalAtivos=entries.filter(([,d])=>d.status==='ativo').length;
     const totalPendentes=entries.filter(([,d])=>d.status==='pendente').length;
+    const isPago=sk=>sk.comissaoStatus==='pago'||(sk.comissaoPaga===true&&sk.comissaoStatus!=='cancelado'&&sk.comissaoStatus!=='pendente');
+    const isPend=sk=>!isPago(sk)&&sk.comissaoStatus!=='cancelado';
+    const totalComRecebida=entries.reduce((s,[,d])=>s+((d.saques||[]).filter(isPago).reduce((a,sk)=>a+sk.comissao,0)),0);
+    const totalComPendente=entries.reduce((s,[,d])=>s+((d.saques||[]).filter(isPend).reduce((a,sk)=>a+sk.comissao,0)),0);
+
+    // Apply filter
+    if(ggFilterEmail!=='todos'&&!allGG[ggFilterEmail]) ggFilterEmail='todos';
+    const filteredEntries=ggFilterEmail==='todos'?entries:entries.filter(([e])=>e===ggFilterEmail);
+
+    // Dropdown options
+    const clientOpts=entries.map(([email,d])=>{
+      const dbU=dbFind(email)||{};
+      return `<option value="${email}" ${ggFilterEmail===email?'selected':''}>${dbU.nome||dbU.name||email}</option>`;
+    }).join('');
 
     container.innerHTML=`
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px">
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;flex:1">
-          <div class="et-stat"><div class="et-stat-label">Clientes Ativos</div><div class="et-stat-val" style="color:var(--teal)">${totalAtivos}</div></div>
-          <div class="et-stat"><div class="et-stat-label">Aguard. Ativação</div><div class="et-stat-val" style="color:var(--gold)">${totalPendentes}</div></div>
-          <div class="et-stat"><div class="et-stat-label">Total Clientes</div><div class="et-stat-val">${entries.length}</div></div>
-          <div class="et-stat"><div class="et-stat-label">Comissão Pendente</div><div class="et-stat-val" style="color:var(--green-text)">R$ ${totalComPendente.toFixed(2)}</div></div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;flex:1">
+          <div style="background:var(--white);border:1px solid var(--border);border-radius:14px;padding:14px 20px;display:flex;align-items:center;gap:14px;box-shadow:0 1px 4px rgba(0,0,0,.05)">
+            <div style="width:36px;height:36px;border-radius:10px;background:#ECFDF5;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <div><div style="font-size:11px;font-weight:700;color:var(--text2);letter-spacing:.5px">ATIVOS</div><div style="font-size:22px;font-weight:800;color:#059669;line-height:1.1">${totalAtivos}</div></div>
+          </div>
+          <div style="background:var(--white);border:1px solid var(--border);border-radius:14px;padding:14px 20px;display:flex;align-items:center;gap:14px;box-shadow:0 1px 4px rgba(0,0,0,.05)">
+            <div style="width:36px;height:36px;border-radius:10px;background:#FFFBEB;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+            <div><div style="font-size:11px;font-weight:700;color:var(--text2);letter-spacing:.5px">AGUARDANDO</div><div style="font-size:22px;font-weight:800;color:#D97706;line-height:1.1">${totalPendentes}</div></div>
+          </div>
+          <div style="background:var(--white);border:1px solid var(--border);border-radius:14px;padding:14px 20px;display:flex;align-items:center;gap:14px;box-shadow:0 1px 4px rgba(0,0,0,.05)">
+            <div style="width:36px;height:36px;border-radius:10px;background:#F0F9FF;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0284C7" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            </div>
+            <div><div style="font-size:11px;font-weight:700;color:var(--text2);letter-spacing:.5px">TOTAL</div><div style="font-size:22px;font-weight:800;color:#0284C7;line-height:1.1">${entries.length}</div></div>
+          </div>
         </div>
         <button class="btn btn-primary" style="flex-shrink:0;gap:7px" onclick="abrirAdicionarClienteGG()">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -4654,9 +4939,20 @@ function renderGestaoGerenciada(){
         </button>
       </div>
 
+      ${entries.length>0?`
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;background:var(--white);border:1px solid var(--border);border-radius:var(--radius2);padding:12px 16px">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text2)" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <label style="font-size:12px;font-weight:700;color:var(--text2);white-space:nowrap">FILTRAR CLIENTE</label>
+        <select class="fi" style="margin:0;flex:1;max-width:320px" onchange="ggFilterEmail=this.value;renderGestaoGerenciada()">
+          <option value="todos" ${ggFilterEmail==='todos'?'selected':''}>Todos os clientes (${entries.length})</option>
+          ${clientOpts}
+        </select>
+        ${ggFilterEmail!=='todos'?`<button onclick="ggFilterEmail='todos';renderGestaoGerenciada()" style="background:none;border:none;cursor:pointer;color:var(--text2);font-size:12px;white-space:nowrap">✕ Limpar</button>`:''}
+      </div>`:''}
+
       ${entries.length===0?`<div style="text-align:center;padding:60px;color:var(--text2)">Nenhum cliente cadastrado ainda. Clique em <strong>+ Adicionar Cliente</strong> para começar.</div>`:''}
 
-      ${entries.map(([email,d])=>{
+      ${filteredEntries.map(([email,d])=>{
         const dbU=dbFind(email)||{};
         const nome=dbU.nome||dbU.name||email;
         const stClr=d.status==='ativo'?'var(--green-text)':d.status==='pendente'?'var(--gold)':'var(--text2)';
@@ -4664,91 +4960,74 @@ function renderGestaoGerenciada(){
         const stLabel=d.status==='ativo'?'✅ Ativo':d.status==='pendente'?'⏳ Pendente':'⛔ Encerrado';
         const lucro=d.bancaAtual-(d.bancaInicial||0);
         return `
-        <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--radius2);padding:20px;margin-bottom:14px">
-          <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px">
-            <div>
-              <div style="font-weight:700;font-size:15px">${nome}</div>
-              <div style="font-size:12px;color:var(--text2)">${email}</div>
-              <div style="font-size:11px;color:var(--text2);margin-top:2px">Contratado em: ${d.contratadoEm||'—'} · Comissão: ${d.comissao}%</div>
+        ${(()=>{
+          const ups=(d.historico||[]).filter(h=>h.tipo==='atualizacao').sort((a,b)=>a.data.localeCompare(b.data));
+          const bancaAtual=ups.length>0?ups[ups.length-1].bancaPos:(d.bancaAtual||0);
+          const lc=parseFloat((bancaAtual-(d.bancaInicial||0)).toFixed(2));
+          const lcPct=d.bancaInicial>0?((lc/d.bancaInicial)*100).toFixed(1):'0.0';
+          return `
+        <div style="background:var(--white);border:1px solid var(--border);border-radius:16px;padding:0;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.06);overflow:hidden;transition:box-shadow .2s" onmouseover="this.style.boxShadow='0 4px 16px rgba(0,0,0,.12)'" onmouseout="this.style.boxShadow='0 2px 8px rgba(0,0,0,.06)'">
+
+          <!-- Card Header -->
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border);background:var(--bg)">
+            <div style="display:flex;align-items:center;gap:10px">
+              <div style="width:34px;height:34px;border-radius:50%;background:var(--teal);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#fff;flex-shrink:0">${(nome||'?')[0].toUpperCase()}</div>
+              <div>
+                <div style="font-weight:700;font-size:14px;line-height:1.2">${nome}</div>
+                <div style="font-size:11px;color:var(--text2)">${email} &nbsp;·&nbsp; Comissão: ${d.comissao}% &nbsp;·&nbsp; Desde: ${d.contratadoEm||'—'}</div>
+              </div>
             </div>
-            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
               <span style="background:${stBg};color:${stClr};font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px">${stLabel}</span>
-              ${d.status==='pendente'?`<button onclick="ativarGestaoUser('${email}')" class="btn btn-primary" style="padding:5px 12px;font-size:12px">✅ Ativar</button>`:''}
-              ${d.status==='ativo'?`<button onclick="encerrarGestaoUser('${email}')" class="btn btn-outline" style="padding:5px 12px;font-size:12px;color:#DC2626;border-color:#FECACA">Encerrar</button>`:''}
+              ${d.status==='pendente'?`<button onclick="ativarGestaoUser('${email}')" class="btn btn-primary" style="padding:4px 12px;font-size:12px;gap:5px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Ativar</button>`:''}
+              ${d.status==='ativo'?`<button onclick="encerrarGestaoUser('${email}')" style="padding:4px 12px;font-size:12px;font-weight:600;border-radius:8px;border:1.5px solid #FECACA;background:#FEF2F2;color:#DC2626;cursor:pointer;display:flex;align-items:center;gap:5px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Encerrar</button>`:''}
+              ${d.status==='encerrado'?`<button onclick="reativarGestaoUser('${email}')" style="padding:4px 12px;font-size:12px;font-weight:600;border-radius:8px;border:1.5px solid #BBF7D0;background:#ECFDF5;color:#059669;cursor:pointer;display:flex;align-items:center;gap:5px"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.09"/></svg>Reativar</button>`:''}
             </div>
           </div>
 
-          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px">
-            <div style="background:var(--bg);padding:12px;border-radius:10px;text-align:center">
-              <div style="font-size:11px;color:var(--text2);font-weight:700;margin-bottom:4px">BANCA INICIAL</div>
-              <div style="font-weight:800;font-size:14px">R$ ${(d.bancaInicial||0).toFixed(2)}</div>
+          <!-- Metrics Row -->
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--border)">
+            <div style="padding:12px 16px;border-right:1px solid var(--border)">
+              <div style="font-size:10px;font-weight:700;color:var(--text2);letter-spacing:.5px;margin-bottom:3px">BANCA INICIAL</div>
+              <div style="font-size:16px;font-weight:800">R$ ${(d.bancaInicial||0).toFixed(2)}</div>
             </div>
-            <div style="background:var(--bg);padding:12px;border-radius:10px;text-align:center">
-              <div style="font-size:11px;color:var(--text2);font-weight:700;margin-bottom:4px">BANCA ATUAL</div>
-              <div style="font-weight:800;font-size:14px;color:var(--teal)">R$ ${(d.bancaAtual||0).toFixed(2)}</div>
+            <div style="padding:12px 16px;border-right:1px solid var(--border)">
+              <div style="font-size:10px;font-weight:700;color:var(--text2);letter-spacing:.5px;margin-bottom:3px">BANCA ATUAL</div>
+              <div style="font-size:16px;font-weight:800;color:var(--teal)">R$ ${bancaAtual.toFixed(2)}</div>
             </div>
-            <div style="background:var(--bg);padding:12px;border-radius:10px;text-align:center">
-              <div style="font-size:11px;color:var(--text2);font-weight:700;margin-bottom:4px">LUCRO</div>
-              <div style="font-weight:800;font-size:14px;color:${lucro>=0?'var(--green-text)':'#DC2626'}">${lucro>=0?'+':''}R$ ${lucro.toFixed(2)}</div>
+            <div style="padding:12px 16px;border-right:1px solid var(--border)">
+              <div style="font-size:10px;font-weight:700;color:var(--text2);letter-spacing:.5px;margin-bottom:3px">LUCRO</div>
+              <div style="font-size:16px;font-weight:800;color:${lc>=0?'#059669':'#DC2626'}">${lc>=0?'+':'-'}R$ ${Math.abs(lc).toFixed(2)}</div>
+              <div style="font-size:10px;font-weight:600;color:${lc>=0?'#059669':'#DC2626'}">${lc>=0?'▲':'▼'} ${Math.abs(parseFloat(lcPct))}%</div>
             </div>
-            <div style="background:var(--bg);padding:12px;border-radius:10px;text-align:center">
-              <div style="font-size:11px;color:var(--text2);font-weight:700;margin-bottom:4px">COMISSÃO PEND.</div>
-              <div style="font-weight:800;font-size:14px;color:var(--gold)">${(d.comissaoPendente||0)>0?'R$ '+(d.comissaoPendente||0).toFixed(2):'—'}</div>
+            <div style="padding:12px 16px">
+              <div style="font-size:10px;font-weight:700;color:var(--text2);letter-spacing:.5px;margin-bottom:3px">ATUALIZAÇÕES</div>
+              <div style="font-size:16px;font-weight:800">${ups.length}</div>
+              <div style="font-size:10px;color:var(--text2)">${ups.length===0?'nenhuma':ups.length===1?'1 registro':ups.length+' registros'}</div>
             </div>
           </div>
 
+          <!-- Actions + Historico (ativo only) -->
           ${d.status==='ativo'?`
-          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
-            <div style="flex:1;min-width:160px">
-              <label style="font-size:11px;font-weight:700;color:var(--text2);display:block;margin-bottom:5px">ATUALIZAR BANCA</label>
-              <input class="fi" type="number" step="0.01" id="gg-banca-edit-${email}" placeholder="Novo valor da banca" style="margin:0">
-            </div>
-            <button onclick="atualizarBancaGG('${email}')" class="btn btn-outline" style="padding:8px 14px;font-size:12px;flex-shrink:0">Atualizar</button>
-            <div style="flex:1;min-width:160px">
-              <label style="font-size:11px;font-weight:700;color:var(--text2);display:block;margin-bottom:5px">REGISTRAR SAQUE</label>
-              <input class="fi" type="number" step="0.01" id="gg-saque-val-${email}" placeholder="Valor do saque" style="margin:0">
-            </div>
-            <button onclick="registrarSaqueGG('${email}')" class="btn btn-primary" style="padding:8px 14px;font-size:12px;flex-shrink:0">Registrar Saque</button>
-
+          <div style="padding:12px 18px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border);background:#FAFAFA">
+            <button onclick="abrirModalAtualizarBanca('${email}')" style="display:flex;align-items:center;gap:6px;padding:7px 14px;font-size:12px;font-weight:700;border-radius:8px;border:1.5px solid var(--teal);background:var(--teal);color:#fff;cursor:pointer">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+              Atualizar Banca
+            </button>
+            <button onclick="setGGTab('${email}','historico')" style="display:flex;align-items:center;gap:6px;padding:7px 14px;font-size:12px;font-weight:700;border-radius:8px;border:1.5px solid var(--border);background:var(--white);color:var(--text);cursor:pointer">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Histórico
+            </button>
+            <button onclick="forcarRecalcGG('${email}')" style="display:flex;align-items:center;gap:6px;padding:7px 14px;font-size:12px;font-weight:700;border-radius:8px;border:1.5px solid var(--border);background:var(--white);color:var(--text2);cursor:pointer">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.09"/></svg>
+              Recalcular
+            </button>
           </div>
-          <div id="gg-hist-${email}"></div>
-          ${(d.saques||[]).length>0?`
-          <div style="margin-top:16px;border-top:1px solid var(--border);padding-top:14px">
-            <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:8px">HISTÓRICO DE SAQUES</div>
-            <table style="width:100%;font-size:12px;border-collapse:collapse">
-              <thead><tr style="background:var(--bg)">
-                <th style="padding:7px 10px;text-align:left;font-weight:700;color:var(--text2)">Data</th>
-                <th style="padding:7px 10px;text-align:right;font-weight:700;color:var(--text2)">Saque</th>
-                <th style="padding:7px 10px;text-align:right;font-weight:700;color:var(--text2)">Comissão (${d.comissao}%)</th>
-                <th style="padding:7px 10px;text-align:right;font-weight:700;color:var(--text2)">Líquido</th>
-                <th style="padding:7px 10px;text-align:center;font-weight:700;color:var(--text2)">Comissão Paga</th>
-                <th style="padding:7px 10px;text-align:center;font-weight:700;color:var(--text2)">Ações</th>
-              </tr></thead>
-              <tbody>${(d.saques||[]).map(s=>{
-                const sid=s.id||'';
-                const pago=s.comissaoPaga;
-                return `<tr style="border-top:1px solid var(--border);${pago?'':'background:#FFFBEB'}">
-                  <td style="padding:7px 10px">${s.data}</td>
-                  <td style="padding:7px 10px;text-align:right;font-weight:600">R$ ${s.valor.toFixed(2)}</td>
-                  <td style="padding:7px 10px;text-align:right;color:var(--gold);font-weight:600">R$ ${s.comissao.toFixed(2)}</td>
-                  <td style="padding:7px 10px;text-align:right;color:var(--green-text);font-weight:600">R$ ${s.liquido.toFixed(2)}</td>
-                  <td style="padding:7px 10px;text-align:center">
-                    <button onclick="toggleComissaoPagaSaque('${email}','${sid}')" style="background:${pago?'var(--green-bg)':'#FEF3C7'};color:${pago?'var(--green-text)':'#92400E'};border:1.5px solid ${pago?'var(--green-text)':'#FDE68A'};border-radius:20px;padding:3px 10px;cursor:pointer;font-size:11px;font-weight:700;white-space:nowrap">
-                      ${pago?'✅ Pago':'⏳ Pendente'}
-                    </button>
-                  </td>
-                  <td style="padding:7px 10px;text-align:center">
-                    <div style="display:flex;gap:5px;justify-content:center">
-                      <button onclick="editarSaqueGG('${email}','${sid}')" style="background:var(--white);color:var(--teal);border:1.5px solid var(--teal);border-radius:6px;padding:3px 8px;cursor:pointer;font-size:11px;font-weight:600">✏️</button>
-                      <button onclick="removerSaqueGG('${email}','${sid}')" style="background:var(--white);color:#DC2626;border:1.5px solid #FECACA;border-radius:6px;padding:3px 8px;cursor:pointer;font-size:11px;font-weight:600">🗑️</button>
-                    </div>
-                  </td>
-                </tr>`;
-              }).join('')}
-              </tbody>
-            </table>
+          <div id="gg-panel-historico-${email}" style="display:none">
+            <div id="gg-hist-${email}"></div>
           </div>`:''}
-          `:''}
+        </div>`;
+        })()}
         </div>`;
       }).join('')}
     `;
@@ -4807,26 +5086,7 @@ function renderGestaoGerenciada(){
           <div class="et-stat"><div class="et-stat-label">Comissão Paga</div><div class="et-stat-val" style="color:var(--gold)">R$ ${(ggU.comissaoPaga||0).toFixed(2)}</div></div>
         </div>
 
-        <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--radius2);padding:20px;margin-bottom:16px">
-          <div style="font-size:14px;font-weight:700;margin-bottom:14px">📊 Histórico de Saques</div>
-          ${(ggU.saques||[]).length===0?`<div style="text-align:center;padding:20px;color:var(--text2);font-size:13px">Nenhum saque realizado ainda.</div>`:`
-          <table style="width:100%;font-size:13px;border-collapse:collapse">
-            <thead><tr style="background:var(--bg)">
-              <th style="padding:9px 12px;text-align:left;font-weight:700;color:var(--text2)">Data</th>
-              <th style="padding:9px 12px;text-align:right;font-weight:700;color:var(--text2)">Saque Total</th>
-              <th style="padding:9px 12px;text-align:right;font-weight:700;color:var(--text2)">Comissão (10%)</th>
-              <th style="padding:9px 12px;text-align:right;font-weight:700;color:var(--text2)">Você Recebe</th>
-            </tr></thead>
-            <tbody>${(ggU.saques||[]).map(s=>`
-              <tr style="border-top:1px solid var(--border)">
-                <td style="padding:9px 12px">${s.data}</td>
-                <td style="padding:9px 12px;text-align:right;font-weight:600">R$ ${s.valor.toFixed(2)}</td>
-                <td style="padding:9px 12px;text-align:right;color:var(--gold);font-weight:600">R$ ${s.comissao.toFixed(2)}</td>
-                <td style="padding:9px 12px;text-align:right;color:var(--green-text);font-weight:700">R$ ${s.liquido.toFixed(2)}</td>
-              </tr>`).join('')}
-            </tbody>
-          </table>`}
-        </div>
+
 
         <div id="gg-hist-${u.email}"></div>
 
@@ -4878,25 +5138,16 @@ function renderGGHistorico(email){
   const mesLabel=GG_MESES[nav.mesIdx]+' '+nav.ano;
   const mesStr=(nav.ano)+'-'+(String(nav.mesIdx+1).padStart(2,'0'));
 
-  // Filter historico by month
-  const allHist=(d.historico||[]).map((h,i)=>({...h,_histIdx:i}));
+  // Filter historico by month — saques NOT shown here (handled in Histórico de Saques)
+  const allHist=(d.historico||[])
+    .filter(h=>h.tipo==='atualizacao')
+    .map((h,i)=>({...h,_histIdx:(d.historico||[]).indexOf(h)}));
   const hist=allHist.filter(h=>h.data&&h.data.startsWith(mesStr));
-  // Also filter saques
-  const saquesMes=(d.saques||[]).filter(s=>s.data&&s.data.startsWith(mesStr));
+  const eventos=hist.sort((a,b)=>a.data.localeCompare(b.data));
 
-  // Merge and sort all events for the month
-  const eventos=[
-    ...hist.map(h=>({...h,_src:'hist'})),
-    ...saquesMes.map(s=>({data:s.data,tipo:'saque',valor:s.valor,comissao:s.comissao,liquido:s.liquido,_src:'saque'}))
-  ].sort((a,b)=>a.data.localeCompare(b.data));
-
-  // Stats for the month
-  const updates=hist.filter(h=>h.tipo==='atualizacao');
-  const gains=updates.filter(h=>h.variacao>0);
-  const losses=updates.filter(h=>h.variacao<0);
+  // Stats for the month — atualizacoes only
+  const updates=hist;
   const lucroMes=updates.reduce((s,h)=>s+(h.variacao||0),0);
-  const totalSaquesMes=saquesMes.reduce((s,sk)=>s+sk.valor,0);
-  const comissaoMes=saquesMes.reduce((s,sk)=>s+sk.comissao,0);
 
   container.innerHTML=`
     <div style="margin-top:18px;border-top:1px solid var(--border);padding-top:16px">
@@ -4909,22 +5160,14 @@ function renderGGHistorico(email){
         </div>
       </div>
 
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px">
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:14px">
         <div style="background:var(--bg);padding:10px;border-radius:10px;text-align:center">
           <div style="font-size:10px;font-weight:700;color:var(--text2);margin-bottom:3px">ATUALIZAÇÕES</div>
           <div style="font-weight:800;font-size:15px">${updates.length}</div>
         </div>
         <div style="background:var(--bg);padding:10px;border-radius:10px;text-align:center">
           <div style="font-size:10px;font-weight:700;color:var(--text2);margin-bottom:3px">RESULTADO MÊS</div>
-          <div style="font-weight:800;font-size:15px;color:${lucroMes>=0?'var(--green-text)':'#DC2626'}">${lucroMes>=0?'+':''}R$ ${lucroMes.toFixed(2)}</div>
-        </div>
-        <div style="background:var(--bg);padding:10px;border-radius:10px;text-align:center">
-          <div style="font-size:10px;font-weight:700;color:var(--text2);margin-bottom:3px">SAQUES NO MÊS</div>
-          <div style="font-weight:800;font-size:15px">${totalSaquesMes>0?'R$ '+totalSaquesMes.toFixed(2):'—'}</div>
-        </div>
-        <div style="background:var(--bg);padding:10px;border-radius:10px;text-align:center">
-          <div style="font-size:10px;font-weight:700;color:var(--text2);margin-bottom:3px">COMISSÃO MÊS</div>
-          <div style="font-weight:800;font-size:15px;color:var(--gold)">${comissaoMes>0?'R$ '+comissaoMes.toFixed(2):'—'}</div>
+          <div style="font-weight:800;font-size:15px;color:${lucroMes>=0?'var(--green-text)':'#DC2626'}">${lucroMes>=0?'+':'-'}R$ ${Math.abs(lucroMes).toFixed(2)}</div>
         </div>
       </div>
 
@@ -4938,23 +5181,23 @@ function renderGGHistorico(email){
             <th style="padding:8px 12px;text-align:right;font-weight:700;color:var(--text2)">Banca Antes</th>
             <th style="padding:8px 12px;text-align:right;font-weight:700;color:var(--text2)">Banca Depois</th>
             <th style="padding:8px 12px;text-align:right;font-weight:700;color:var(--text2)">Variação</th>
-            ${isAdminPlus?'<th style="padding:8px 12px;text-align:center;font-weight:700;color:var(--text2)">Ações</th>':''}
+
           </tr></thead>
           <tbody>
             ${eventos.map((ev,evIdx)=>{
               let tipo='',bancaAntes='—',bancaDepois='—',variacao='',varClr='var(--text)';
               tipo='<span style="background:var(--teal-light);color:var(--teal);font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px">📊 Atualização</span>';
               bancaAntes='R$ '+(ev.bancaAntes||0).toFixed(2);
-              bancaDepois='R$ '+(ev.bancaPos||0).toFixed(2);
+              bancaDepois='R$ '+(ev.bancaPos||0).toFixed(2)+(ev.obs?`<br><span style="font-size:10px;color:var(--text2)">${ev.obs}</span>`:'');
               const v=ev.variacao||0;
               varClr=v>0?'var(--green-text)':v<0?'#DC2626':'var(--text2)';
               variacao=`<strong style="color:${varClr}">${v>=0?'+':''}R$ ${v.toFixed(2)}</strong>`;
-              const acoes=isAdminPlus&&ev.tipo==='atualizacao'
+              const acoes=isAdminPlus
                 ?`<td style="padding:8px 12px;text-align:center"><div style="display:flex;gap:5px;justify-content:center">
                     <button onclick="editarAtualizacaoGG('${email}',${ev._histIdx})" style="background:var(--white);color:var(--teal);border:1.5px solid var(--teal);border-radius:6px;padding:3px 8px;cursor:pointer;font-size:11px">✏️</button>
                     <button onclick="removerAtualizacaoGG('${email}',${ev._histIdx})" style="background:var(--white);color:#DC2626;border:1.5px solid #FECACA;border-radius:6px;padding:3px 8px;cursor:pointer;font-size:11px">🗑️</button>
                   </div></td>`
-                :(isAdminPlus?'<td></td>':'');
+                :'';
               return `<tr style="border-top:1px solid var(--border)">
                 <td style="padding:8px 12px">${ev.data}</td>
                 <td style="padding:8px 12px">${tipo}</td>
@@ -4968,37 +5211,6 @@ function renderGGHistorico(email){
         </table>`
       }
 
-      ${saquesMes.length>0?`
-      <div style="font-size:12px;font-weight:700;color:var(--text2);margin-bottom:6px;margin-top:4px">💸 Saques do Mês</div>
-      <table style="width:100%;font-size:12px;border-collapse:collapse;background:var(--white);border:1px solid var(--border);border-radius:10px;overflow:hidden">
-        <thead><tr style="background:var(--bg)">
-          <th style="padding:8px 12px;text-align:left;font-weight:700;color:var(--text2)">Data</th>
-          <th style="padding:8px 12px;text-align:right;font-weight:700;color:var(--text2)">Saque</th>
-          <th style="padding:8px 12px;text-align:right;font-weight:700;color:var(--text2)">Comissão</th>
-          <th style="padding:8px 12px;text-align:right;font-weight:700;color:var(--text2)">Líquido</th>
-          <th style="padding:8px 12px;text-align:center;font-weight:700;color:var(--text2)">Com. Paga</th>
-          ${isAdminPlus?'<th style="padding:8px 12px;text-align:center;font-weight:700;color:var(--text2)">Ações</th>':''}
-        </tr></thead>
-        <tbody>${saquesMes.map(s=>{
-          const sid=s.id||'';
-          const pago=s.comissaoPaga;
-          return `<tr style="border-top:1px solid var(--border);${pago?'':'background:#FFFBEB'}">
-            <td style="padding:8px 12px">${s.data}</td>
-            <td style="padding:8px 12px;text-align:right;font-weight:600">R$ ${s.valor.toFixed(2)}</td>
-            <td style="padding:8px 12px;text-align:right;color:var(--gold);font-weight:600">R$ ${s.comissao.toFixed(2)}</td>
-            <td style="padding:8px 12px;text-align:right;color:var(--green-text);font-weight:600">R$ ${s.liquido.toFixed(2)}</td>
-            <td style="padding:8px 12px;text-align:center">
-              <button onclick="toggleComissaoPagaSaque('${email}','${sid}')" style="background:${pago?'var(--green-bg)':'#FEF3C7'};color:${pago?'var(--green-text)':'#92400E'};border:1.5px solid ${pago?'var(--green-text)':'#FDE68A'};border-radius:20px;padding:3px 10px;cursor:pointer;font-size:11px;font-weight:700;white-space:nowrap">
-                ${pago?'✅ Pago':'⏳ Pendente'}
-              </button>
-            </td>
-            ${isAdminPlus?`<td style="padding:8px 12px;text-align:center"><div style="display:flex;gap:5px;justify-content:center">
-              <button onclick="editarSaqueGG('${email}','${sid}')" style="background:var(--white);color:var(--teal);border:1.5px solid var(--teal);border-radius:6px;padding:3px 8px;cursor:pointer;font-size:11px">✏️</button>
-              <button onclick="removerSaqueGG('${email}','${sid}')" style="background:var(--white);color:#DC2626;border:1.5px solid #FECACA;border-radius:6px;padding:3px 8px;cursor:pointer;font-size:11px">🗑️</button>
-            </div></td>`:''}
-          </tr>`;
-        }).join('')}</tbody>
-      </table>`:''}
     </div>`;
 }
 
@@ -5041,6 +5253,542 @@ function salvarClienteGG(){
   closeM('m-gg-add');
   renderGestaoGerenciada();
   showToast('Cliente adicionado com sucesso! ✅');
+}
+
+
+function registrarSaqueHS(){
+  const email=document.getElementById('hs-saque-email')?.value;
+  const val=parseFloat(document.getElementById('hs-saque-val')?.value||0);
+  if(!email){showToast('Selecione um cliente ❌');return;}
+  if(!val||val<=0){showToast('Informe um valor válido ❌');return;}
+  const all=getGGData();
+  const u=all[email]; if(!u)return;
+  if(val>u.bancaAtual){showToast('Valor maior que a banca atual ❌');return;}
+  const comissao=parseFloat((val*(u.comissao/100)).toFixed(2));
+  const liquido=parseFloat((val-comissao).toFixed(2));
+  const saqueId='saque_'+Date.now();
+  const saque={id:saqueId,data:new Date().toISOString().split('T')[0],valor:val,comissao,liquido,comissaoPaga:false,comissaoStatus:'pendente'};
+  u.saques=u.saques||[];
+  u.saques.push(saque);
+  u.bancaAtual=parseFloat((u.bancaAtual-val).toFixed(2));
+  saveGGData(all);
+  document.getElementById('hs-saque-val').value='';
+  logAction('gestao','Saque registrado via Histórico de Saques','Email: '+email+' | Saque: R$ '+val+' | Comissão: R$ '+comissao);
+  renderHistSaques();
+  showToast('Saque registrado! Comissão: R$ '+comissao.toFixed(2)+' ✅');
+}
+
+
+// ═══════════════════════════════════════════════
+// CONTRATOS
+// ═══════════════════════════════════════════════
+function getContratos(){try{return JSON.parse(localStorage.getItem('kt_contratos')||'[]')}catch{return []}}
+function saveContratos(d){localStorage.setItem('kt_contratos',JSON.stringify(d))}
+
+let ctFilterUser='todos';
+let ctFilterStatus='todos';
+
+function calcContrato(c){
+  const bi=c.bancaInicial||0;
+  const bf=c.bancaFinal||0;
+  const pct=c.comissaoPercentual||0;
+  const lucro=parseFloat((bf-bi).toFixed(2));
+  const valorComissao=lucro>0?parseFloat((lucro*(pct/100)).toFixed(2)):0;
+  const valorCliente=parseFloat((bf-valorComissao).toFixed(2));
+  let duracaoDias=null;
+  if(c.dataInicial&&c.dataFinal){
+    const d1=new Date(c.dataInicial+'T12:00:00');
+    const d2=new Date(c.dataFinal+'T12:00:00');
+    duracaoDias=Math.max(0,Math.round((d2-d1)/(1000*60*60*24)));
+  }
+  return {...c,lucro,valorComissao,valorCliente,duracaoDias};
+}
+
+function calcContratoPreview(){
+  const bi=parseFloat(document.getElementById('cf-banca-ini').value||0);
+  const bf=parseFloat(document.getElementById('cf-banca-fin').value||0);
+  const pct=parseFloat(document.getElementById('cf-comissao-pct').value||0);
+  const di=document.getElementById('cf-data-inicio').value;
+  const df=document.getElementById('cf-data-fim').value;
+  if(!bi&&!bf){document.getElementById('cf-preview').style.display='none';return;}
+  document.getElementById('cf-preview').style.display='block';
+  const lucro=parseFloat((bf-bi).toFixed(2));
+  const com=lucro>0?parseFloat((lucro*(pct/100)).toFixed(2)):0;
+  const cli=parseFloat((bf-com).toFixed(2));
+  let dias='—';
+  if(di&&df){const d1=new Date(di+'T12:00:00');const d2=new Date(df+'T12:00:00');dias=Math.max(0,Math.round((d2-d1)/(1000*60*60*24)))+' dias';}
+  document.getElementById('cf-prev-lucro').textContent=(lucro>=0?'+':'')+' R$ '+Math.abs(lucro).toFixed(2);
+  document.getElementById('cf-prev-lucro').style.color=lucro>0?'#059669':lucro<0?'#DC2626':'var(--text)';
+  document.getElementById('cf-prev-com').textContent='R$ '+com.toFixed(2);
+  document.getElementById('cf-prev-cli').textContent='R$ '+cli.toFixed(2);
+  document.getElementById('cf-prev-dias').textContent=dias;
+}
+
+function abrirNovoContrato(){
+  document.getElementById('m-contrato-form-title').textContent='📄 Novo Contrato';
+  document.getElementById('cf-id').value='';
+  document.getElementById('cf-data-inicio').value=new Date().toISOString().split('T')[0];
+  document.getElementById('cf-data-fim').value='';
+  document.getElementById('cf-banca-ini').value='';
+  document.getElementById('cf-banca-fin').value='';
+  document.getElementById('cf-comissao-pct').value='10';
+  document.getElementById('cf-status').value='Ativo';
+  document.getElementById('cf-motivo').value='';
+  document.getElementById('cf-obs').value='';
+  document.getElementById('cf-err').style.display='none';
+  document.getElementById('cf-preview').style.display='none';
+  // Populate users
+  const sel=document.getElementById('cf-usuario');
+  const membros=DB.filter(u=>u.role==='Membro');
+  sel.innerHTML=membros.map(u=>`<option value="${u.email}">${u.nome||u.name||u.email} (${u.email})</option>`).join('');
+  openM('m-contrato-form');
+}
+
+function editarContrato(id){
+  const all=getContratos();
+  const c=all.find(x=>x.id===id); if(!c)return;
+  document.getElementById('m-contrato-form-title').textContent='✏️ Editar Contrato';
+  document.getElementById('cf-id').value=id;
+  const sel=document.getElementById('cf-usuario');
+  const membros=DB.filter(u=>u.role==='Membro');
+  sel.innerHTML=membros.map(u=>`<option value="${u.email}">${u.nome||u.name||u.email} (${u.email})</option>`).join('');
+  sel.value=c.usuarioId;
+  document.getElementById('cf-data-inicio').value=c.dataInicial||'';
+  document.getElementById('cf-data-fim').value=c.dataFinal||'';
+  document.getElementById('cf-banca-ini').value=c.bancaInicial||'';
+  document.getElementById('cf-banca-fin').value=c.bancaFinal||'';
+  document.getElementById('cf-comissao-pct').value=c.comissaoPercentual||10;
+  document.getElementById('cf-status').value=c.statusContrato||'Ativo';
+  document.getElementById('cf-motivo').value=c.motivoFim||'';
+  document.getElementById('cf-obs').value=c.observacoes||'';
+  document.getElementById('cf-err').style.display='none';
+  calcContratoPreview();
+  openM('m-contrato-form');
+}
+
+function salvarContrato(){
+  const errEl=document.getElementById('cf-err');
+  const usuarioId=document.getElementById('cf-usuario').value;
+  const dataInicial=document.getElementById('cf-data-inicio').value;
+  const bancaInicial=parseFloat(document.getElementById('cf-banca-ini').value||0);
+  const comissaoPercentual=parseFloat(document.getElementById('cf-comissao-pct').value||0);
+  if(!usuarioId){errEl.textContent='Selecione um usuário.';errEl.style.display='block';return;}
+  if(!dataInicial){errEl.textContent='Informe a data inicial.';errEl.style.display='block';return;}
+  if(!bancaInicial||bancaInicial<=0){errEl.textContent='Informe a banca inicial.';errEl.style.display='block';return;}
+  if(comissaoPercentual<0||comissaoPercentual>100){errEl.textContent='Comissão inválida (0–100%).';errEl.style.display='block';return;}
+  errEl.style.display='none';
+  const dbU=dbFind(usuarioId)||{};
+  const all=getContratos();
+  const editId=document.getElementById('cf-id').value;
+  const raw={
+    id:editId||'ct_'+Date.now(),
+    usuarioId,
+    nomeUsuario:dbU.nome||dbU.name||usuarioId,
+    bancaInicial,
+    bancaFinal:parseFloat(document.getElementById('cf-banca-fin').value||0)||null,
+    comissaoPercentual,
+    dataInicial,
+    dataFinal:document.getElementById('cf-data-fim').value||null,
+    statusContrato:document.getElementById('cf-status').value,
+    motivoFim:document.getElementById('cf-motivo').value||null,
+    observacoes:document.getElementById('cf-obs').value.trim()||null,
+    criadoEm:editId?all.find(x=>x.id===editId)?.criadoEm:new Date().toISOString(),
+    atualizadoEm:new Date().toISOString(),
+  };
+  const contrato=calcContrato(raw);
+  if(editId){
+    const idx=all.findIndex(x=>x.id===editId);
+    if(idx>=0)all[idx]=contrato;
+  } else {
+    all.unshift(contrato);
+  }
+  saveContratos(all);
+  closeM('m-contrato-form');
+  renderContratos();
+  logAction('contratos',editId?'Contrato editado':'Contrato criado','Usuário: '+usuarioId+' | Banca: R$ '+bancaInicial);
+  showToast(editId?'Contrato atualizado ✅':'Contrato criado ✅');
+}
+
+function abrirEncerrarContrato(id){
+  const c=getContratos().find(x=>x.id===id); if(!c)return;
+  document.getElementById('ce-id').value=id;
+  document.getElementById('ce-banca-fin').value=c.bancaFinal||'';
+  document.getElementById('ce-motivo').value=c.motivoFim||'Fim do prazo';
+  document.getElementById('ce-status').value='Encerrado';
+  document.getElementById('ce-obs').value=c.observacoes||'';
+  document.getElementById('ce-err').style.display='none';
+  openM('m-contrato-encerrar');
+}
+
+function confirmarEncerrarContrato(){
+  const id=document.getElementById('ce-id').value;
+  const bancaFinal=parseFloat(document.getElementById('ce-banca-fin').value||0);
+  const motivo=document.getElementById('ce-motivo').value;
+  const status=document.getElementById('ce-status').value;
+  const obs=document.getElementById('ce-obs').value.trim();
+  const errEl=document.getElementById('ce-err');
+  if(!bancaFinal&&bancaFinal!==0){errEl.textContent='Informe a banca final.';errEl.style.display='block';return;}
+  if(!motivo){errEl.textContent='Selecione o motivo.';errEl.style.display='block';return;}
+  const all=getContratos();
+  const idx=all.findIndex(x=>x.id===id); if(idx<0)return;
+  const raw={...all[idx],bancaFinal,motivoFim:motivo,statusContrato:status,observacoes:obs||all[idx].observacoes,dataFinal:all[idx].dataFinal||new Date().toISOString().split('T')[0],atualizadoEm:new Date().toISOString()};
+  all[idx]=calcContrato(raw);
+  saveContratos(all);
+  closeM('m-contrato-encerrar');
+  renderContratos();
+  logAction('contratos','Contrato encerrado','ID: '+id+' | Motivo: '+motivo);
+  showToast('Contrato encerrado ✅');
+}
+
+function excluirContrato(id){
+  confirmAction('Excluir este contrato? Esta ação não pode ser desfeita.', ()=>{
+    const all=getContratos().filter(x=>x.id!==id);
+    saveContratos(all);
+    renderContratos();
+    showToast('Contrato excluído ✅');
+  },'Excluir');
+}
+
+const STATUS_CFG={
+  'Ativo':          {bg:'#ECFDF5',color:'#059669',border:'#6EE7B7',dot:'#059669'},
+  'Finalizado':     {bg:'#EFF6FF',color:'#2563EB',border:'#93C5FD',dot:'#2563EB'},
+  'Encerrado':      {bg:'#FEF2F2',color:'#DC2626',border:'#FECACA',dot:'#DC2626'},
+  'Cancelado':      {bg:'#F3F4F6',color:'#6B7280',border:'#D1D5DB',dot:'#6B7280'},
+  'Aguardando saque':{bg:'#FFFBEB',color:'#D97706',border:'#FDE68A',dot:'#D97706'},
+};
+
+function renderContratos(){
+  const container=document.getElementById('contratos-container');
+  if(!container)return;
+  const u=S.loggedUser; if(!u)return;
+  const isAdminPlus=u.role==='Master'||u.role==='Admin';
+  if(!isAdminPlus){container.innerHTML=`<div style="text-align:center;padding:60px;color:var(--text2)">Acesso restrito a administradores.</div>`;return;}
+
+  const all=getContratos();
+
+  // Summary
+  const ativos=all.filter(c=>c.statusContrato==='Ativo').length;
+  const finalizados=all.filter(c=>c.statusContrato==='Finalizado').length;
+  const totalCom=all.filter(c=>c.valorComissao>0).reduce((s,c)=>s+(c.valorComissao||0),0);
+  const totalLucro=all.filter(c=>(c.lucro||0)>0).reduce((s,c)=>s+(c.lucro||0),0);
+
+  // Filters
+  const users=[...new Set(all.map(c=>c.usuarioId))];
+  const statuses=[...new Set(all.map(c=>c.statusContrato))];
+
+  // Apply filters
+  let filtered=all;
+  if(ctFilterUser!=='todos') filtered=filtered.filter(c=>c.usuarioId===ctFilterUser);
+  if(ctFilterStatus!=='todos') filtered=filtered.filter(c=>c.statusContrato===ctFilterStatus);
+
+  container.innerHTML=`
+    <!-- Summary Cards -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">
+      <div style="background:var(--white);border:1px solid var(--border);border-radius:14px;padding:14px 18px;display:flex;align-items:center;gap:12px;box-shadow:0 1px 4px rgba(0,0,0,.05)">
+        <div style="width:36px;height:36px;border-radius:10px;background:#ECFDF5;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        </div>
+        <div><div style="font-size:10px;font-weight:700;color:var(--text2);letter-spacing:.5px">ATIVOS</div><div style="font-size:22px;font-weight:800;color:#059669;line-height:1.1">${ativos}</div></div>
+      </div>
+      <div style="background:var(--white);border:1px solid var(--border);border-radius:14px;padding:14px 18px;display:flex;align-items:center;gap:12px;box-shadow:0 1px 4px rgba(0,0,0,.05)">
+        <div style="width:36px;height:36px;border-radius:10px;background:#EFF6FF;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div><div style="font-size:10px;font-weight:700;color:var(--text2);letter-spacing:.5px">FINALIZADOS</div><div style="font-size:22px;font-weight:800;color:#2563EB;line-height:1.1">${finalizados}</div></div>
+      </div>
+      <div style="background:var(--white);border:1px solid var(--border);border-radius:14px;padding:14px 18px;display:flex;align-items:center;gap:12px;box-shadow:0 1px 4px rgba(0,0,0,.05)">
+        <div style="width:36px;height:36px;border-radius:10px;background:#FFFBEB;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        </div>
+        <div><div style="font-size:10px;font-weight:700;color:var(--text2);letter-spacing:.5px">COMISSÃO TOTAL</div><div style="font-size:18px;font-weight:800;color:#D97706;line-height:1.1">R$ ${totalCom.toFixed(2)}</div></div>
+      </div>
+      <div style="background:var(--white);border:1px solid var(--border);border-radius:14px;padding:14px 18px;display:flex;align-items:center;gap:12px;box-shadow:0 1px 4px rgba(0,0,0,.05)">
+        <div style="width:36px;height:36px;border-radius:10px;background:#F0FDF4;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+        </div>
+        <div><div style="font-size:10px;font-weight:700;color:var(--text2);letter-spacing:.5px">LUCRO TOTAL</div><div style="font-size:18px;font-weight:800;color:#059669;line-height:1.1">R$ ${totalLucro.toFixed(2)}</div></div>
+      </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--radius2);padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <select class="fi" style="margin:0;min-width:200px;flex:1;max-width:260px" onchange="ctFilterUser=this.value;renderContratos()">
+        <option value="todos" ${ctFilterUser==='todos'?'selected':''}>👤 Todos os usuários</option>
+        ${users.map(e=>{const dbU=dbFind(e)||{};return `<option value="${e}" ${ctFilterUser===e?'selected':''}>${dbU.nome||dbU.name||e}</option>`;}).join('')}
+      </select>
+      <select class="fi" style="margin:0;min-width:180px;flex:1;max-width:220px" onchange="ctFilterStatus=this.value;renderContratos()">
+        <option value="todos" ${ctFilterStatus==='todos'?'selected':''}>📋 Todos os status</option>
+        ${['Ativo','Aguardando saque','Finalizado','Encerrado','Cancelado'].map(s=>`<option value="${s}" ${ctFilterStatus===s?'selected':''}>${s}</option>`).join('')}
+      </select>
+      ${(ctFilterUser!=='todos'||ctFilterStatus!=='todos')?`<button onclick="ctFilterUser='todos';ctFilterStatus='todos';renderContratos()" style="background:none;border:none;cursor:pointer;color:var(--text2);font-size:12px;font-weight:600;white-space:nowrap">✕ Limpar filtros</button>`:''}
+      <div style="flex:1"></div>
+      <button onclick="abrirNovoContrato()" class="btn btn-primary" style="gap:6px;flex-shrink:0">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Novo Contrato
+      </button>
+    </div>
+
+    <!-- Table -->
+    ${filtered.length===0
+      ?`<div style="text-align:center;padding:60px;color:var(--text2);background:var(--white);border:1px solid var(--border);border-radius:var(--radius2)">
+          <div style="font-size:40px;margin-bottom:12px">📄</div>
+          <div style="font-weight:700;margin-bottom:4px">Nenhum contrato encontrado</div>
+          <div style="font-size:13px">Clique em <strong>+ Novo Contrato</strong> para começar.</div>
+        </div>`
+      :`<div style="background:var(--white);border:1px solid var(--border);border-radius:var(--radius2);overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.04)">
+        <table style="width:100%;font-size:13px;border-collapse:collapse">
+          <thead>
+            <tr style="background:var(--bg);border-bottom:2px solid var(--border)">
+              <th style="padding:10px 14px;text-align:left;font-weight:700;color:var(--text2);font-size:11px;letter-spacing:.4px">USUÁRIO</th>
+              <th style="padding:10px 14px;text-align:left;font-weight:700;color:var(--text2);font-size:11px;letter-spacing:.4px">PERÍODO</th>
+              <th style="padding:10px 14px;text-align:right;font-weight:700;color:var(--text2);font-size:11px;letter-spacing:.4px">BANCA INI.</th>
+              <th style="padding:10px 14px;text-align:right;font-weight:700;color:var(--text2);font-size:11px;letter-spacing:.4px">BANCA FIN.</th>
+              <th style="padding:10px 14px;text-align:right;font-weight:700;color:var(--text2);font-size:11px;letter-spacing:.4px">LUCRO</th>
+              <th style="padding:10px 14px;text-align:right;font-weight:700;color:var(--text2);font-size:11px;letter-spacing:.4px">COMISSÃO</th>
+              <th style="padding:10px 14px;text-align:right;font-weight:700;color:var(--text2);font-size:11px;letter-spacing:.4px">VL. CLIENTE</th>
+              <th style="padding:10px 14px;text-align:center;font-weight:700;color:var(--text2);font-size:11px;letter-spacing:.4px">STATUS</th>
+              <th style="padding:10px 14px;text-align:center;font-weight:700;color:var(--text2);font-size:11px;letter-spacing:.4px">AÇÕES</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${filtered.map(c=>{
+              const sc=STATUS_CFG[c.statusContrato]||STATUS_CFG['Cancelado'];
+              const lucro=c.lucro||0;
+              const dias=c.duracaoDias!=null?c.duracaoDias+'d':'—';
+              const dataFim=c.dataFinal||'—';
+              const canEncerrar=c.statusContrato==='Ativo'||c.statusContrato==='Aguardando saque';
+              return `<tr style="border-top:1px solid var(--border);transition:background .15s" onmouseover="this.style.background='var(--bg)'" onmouseout="this.style.background=''">
+                <td style="padding:10px 14px">
+                  <div style="font-weight:700;font-size:13px">${c.nomeUsuario||c.usuarioId}</div>
+                  <div style="font-size:11px;color:var(--text2)">${c.usuarioId}</div>
+                  ${c.motivoFim?`<div style="font-size:10px;color:var(--text2);margin-top:1px">📌 ${c.motivoFim}</div>`:''}
+                </td>
+                <td style="padding:10px 14px">
+                  <div style="font-size:12px">${c.dataInicial||'—'} → ${dataFim}</div>
+                  <div style="font-size:11px;color:var(--text2)">⏱ ${dias} &nbsp;·&nbsp; ${c.comissaoPercentual||0}% com.</div>
+                </td>
+                <td style="padding:10px 14px;text-align:right;font-weight:600">R$ ${(c.bancaInicial||0).toFixed(2)}</td>
+                <td style="padding:10px 14px;text-align:right;font-weight:600;color:var(--teal)">${c.bancaFinal!=null?'R$ '+c.bancaFinal.toFixed(2):'—'}</td>
+                <td style="padding:10px 14px;text-align:right;font-weight:700;color:${lucro>0?'#059669':lucro<0?'#DC2626':'var(--text2)'}">${lucro!==0?(lucro>0?'+':'')+' R$ '+Math.abs(lucro).toFixed(2):'—'}</td>
+                <td style="padding:10px 14px;text-align:right;font-weight:600;color:var(--gold)">${(c.valorComissao||0)>0?'R$ '+c.valorComissao.toFixed(2):'—'}</td>
+                <td style="padding:10px 14px;text-align:right;font-weight:600;color:var(--teal)">${c.valorCliente!=null&&c.bancaFinal!=null?'R$ '+c.valorCliente.toFixed(2):'—'}</td>
+                <td style="padding:10px 14px;text-align:center">
+                  <span style="background:${sc.bg};color:${sc.color};border:1px solid ${sc.border};font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;white-space:nowrap">
+                    <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${sc.dot};margin-right:5px;vertical-align:middle"></span>${c.statusContrato}
+                  </span>
+                </td>
+                <td style="padding:10px 14px;text-align:center">
+                  <div style="display:flex;gap:5px;justify-content:center">
+                    <button onclick="editarContrato('${c.id}')" title="Editar" style="background:var(--white);color:var(--teal);border:1.5px solid var(--teal);border-radius:7px;padding:5px 9px;cursor:pointer;font-size:12px" onmouseover="this.style.background='var(--teal-light)'" onmouseout="this.style.background='var(--white)'">✏️</button>
+                    ${canEncerrar?`<button onclick="abrirEncerrarContrato('${c.id}')" title="Encerrar" style="background:var(--white);color:#DC2626;border:1.5px solid #FECACA;border-radius:7px;padding:5px 9px;cursor:pointer;font-size:12px" onmouseover="this.style.background='#FEF2F2'" onmouseout="this.style.background='var(--white)'">⛔</button>`:''}
+                    <button onclick="excluirContrato('${c.id}')" title="Excluir" style="background:var(--white);color:#9CA3AF;border:1.5px solid #E5E7EB;border-radius:7px;padding:5px 9px;cursor:pointer;font-size:12px" onmouseover="this.style.background='#F9FAFB'" onmouseout="this.style.background='var(--white)'">🗑️</button>
+                  </div>
+                </td>
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+        <div style="padding:10px 16px;border-top:1px solid var(--border);background:var(--bg);font-size:12px;color:var(--text2)">
+          ${filtered.length} contrato${filtered.length!==1?'s':''} exibido${filtered.length!==1?'s':''}${all.length!==filtered.length?' (de '+all.length+' total)':''}
+        </div>
+      </div>`}
+  `;
+}
+
+function setComissaoStatus(email, saqueId, status){
+  const all=getGGData();
+  const u=all[email]; if(!u)return;
+  const saque=(u.saques||[]).find(s=>s.id===saqueId);
+  if(!saque)return;
+  saque.comissaoStatus=status;
+  saque.comissaoPaga=(status==='pago');
+  u.comissaoPaga=parseFloat((u.saques||[]).filter(s=>s.comissaoPaga).reduce((sum,s)=>sum+s.comissao,0).toFixed(2));
+  u.comissaoPendente=parseFloat((u.saques||[]).filter(s=>!s.comissaoPaga).reduce((sum,s)=>sum+s.comissao,0).toFixed(2));
+  saveGGData(all);
+  // Re-render whichever page is visible
+  const hsPage=document.getElementById('page-histsaques');
+  const ggPage=document.getElementById('page-gestaogerenciada');
+  if(hsPage&&hsPage.style.display!=='none') renderHistSaques();
+  if(ggPage&&ggPage.style.display!=='none'){
+    renderGestaoGerenciada();
+    setTimeout(()=>{
+      Object.keys(getGGData()).forEach(em=>{
+        if(document.getElementById('gg-hist-'+em)) setGGTab(em,_ggActiveTab[em]||'historico');
+      });
+    },50);
+  }
+  const labels={pago:'✅ Pago',pendente:'⏳ Pendente',cancelado:'❌ Cancelado'};
+  showToast('Comissão: '+labels[status]);
+}
+
+let hsFilterEmail='todos';
+let ggFilterEmail='todos';
+
+function renderHistSaques(){
+  const u=S.loggedUser; if(!u)return;
+  const isAdminPlus=u.role==='Master'||u.role==='Admin';
+  const container=document.getElementById('hs-container');
+  if(!container)return;
+
+  const allGG=getGGData();
+
+  // Build full saques list
+  let rows=[];
+  if(isAdminPlus){
+    Object.entries(allGG).forEach(([email,d])=>{
+      (d.saques||[]).forEach(s=>{
+        const dbU=dbFind(email)||{};
+        rows.push({...s,email,nome:dbU.nome||dbU.name||email,comissao_pct:d.comissao});
+      });
+    });
+  } else {
+    const d=allGG[u.email];
+    if(d)(d.saques||[]).forEach(s=>rows.push({...s,email:u.email,nome:u.nome||u.name||u.email,comissao_pct:d.comissao}));
+  }
+
+  rows.sort((a,b)=>b.data.localeCompare(a.data));
+
+  // Filter by user
+  const filtered=hsFilterEmail==='todos'?rows:rows.filter(r=>r.email===hsFilterEmail);
+
+  // Stats — sempre relido direto do localStorage para garantir dados frescos
+  const _ggFresh=getGGData();
+  const _freshRows=[];
+  if(isAdminPlus){
+    Object.entries(_ggFresh).forEach(([email,d])=>{
+      const dbU=dbFind(email)||{};
+      (d.saques||[]).forEach(s=>{
+        _freshRows.push({...s,email,nome:dbU.nome||dbU.name||email});
+      });
+    });
+  } else {
+    const d=_ggFresh[S.loggedUser?.email];
+    if(d)(d.saques||[]).forEach(s=>_freshRows.push({...s,email:S.loggedUser.email}));
+  }
+  const freshFiltered=hsFilterEmail==='todos'?_freshRows:_freshRows.filter(r=>r.email===hsFilterEmail);
+  const getStatus=r=>{
+    if(r.comissaoStatus==='pago') return 'pago';
+    if(r.comissaoStatus==='cancelado') return 'cancelado';
+    if(r.comissaoPaga===true) return 'pago';
+    return 'pendente';
+  };
+  const totalSaques=freshFiltered.reduce((s,r)=>s+r.valor,0);
+  const totalCom=freshFiltered.reduce((s,r)=>s+r.comissao,0);
+  const totalLiq=freshFiltered.reduce((s,r)=>s+r.liquido,0);
+  const comPaga=freshFiltered.filter(r=>getStatus(r)==='pago').reduce((s,r)=>s+r.comissao,0);
+  const comPend=freshFiltered.filter(r=>getStatus(r)==='pendente').reduce((s,r)=>s+r.comissao,0);
+
+  // User filter dropdown (admin only)
+  const users=isAdminPlus?[...new Set(rows.map(r=>r.email))]:[];
+  const filterHtml=isAdminPlus?`
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+      <label style="font-size:12px;font-weight:700;color:var(--text2)">FILTRAR POR CLIENTE</label>
+      <select class="fi" style="margin:0;padding:7px 12px;min-width:200px" onchange="hsFilterEmail=this.value;renderHistSaques()">
+        <option value="todos" ${hsFilterEmail==='todos'?'selected':''}>Todos os clientes</option>
+        ${users.map(e=>`<option value="${e}" ${hsFilterEmail===e?'selected':''}>${dbFind(e)?.nome||dbFind(e)?.name||e}</option>`).join('')}
+      </select>
+    </div>`:'';
+
+  const statusCfg={
+    pago:     {label:'✅ Pago',      bg:'#DCFCE7',color:'#15803D',border:'#86EFAC'},
+    pendente: {label:'🕐 Pendente',  bg:'#FEF3C7',color:'#92400E',border:'#FCD34D'},
+    cancelado:{label:'✕ Cancelado',  bg:'#FEE2E2',color:'#DC2626',border:'#FCA5A5'},
+  };
+
+  // Build registrar saque select options
+  const ggAtivos=Object.entries(getGGData()).filter(([,d])=>d.status==='ativo');
+  const saqClienteOpts=ggAtivos.map(([email,d])=>{
+    const dbU=dbFind(email)||{};
+    return `<option value="${email}">${dbU.nome||dbU.name||email}</option>`;
+  }).join('');
+
+  const registrarSaqueHtml=isAdminPlus&&ggAtivos.length>0?`
+    <div style="background:var(--white);border:1px solid var(--border);border-radius:var(--radius2);padding:16px 20px;margin-bottom:20px">
+      <div style="font-size:13px;font-weight:700;margin-bottom:12px">💸 Registrar Novo Saque</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
+        <div style="flex:1;min-width:160px">
+          <label style="font-size:11px;font-weight:700;color:var(--text2);display:block;margin-bottom:5px">CLIENTE</label>
+          <select class="fi" id="hs-saque-email" style="margin:0">${saqClienteOpts}</select>
+        </div>
+        <div style="flex:1;min-width:140px">
+          <label style="font-size:11px;font-weight:700;color:var(--text2);display:block;margin-bottom:5px">VALOR DO SAQUE (R$)</label>
+          <input class="fi" type="number" step="0.01" id="hs-saque-val" placeholder="Ex: 50.00" style="margin:0">
+        </div>
+        <button onclick="registrarSaqueHS()" class="btn btn-primary" style="padding:9px 18px;font-size:13px;flex-shrink:0">Registrar Saque</button>
+      </div>
+    </div>`:'';
+
+  container.innerHTML=`
+    ${registrarSaqueHtml}
+    ${filterHtml}
+    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:20px">
+      <div class="et-stat"><div class="et-stat-label">Total Saques</div><div class="et-stat-val">${freshFiltered.length}</div></div>
+      <div class="et-stat"><div class="et-stat-label">Valor Total</div><div class="et-stat-val">R$ ${totalSaques.toFixed(2)}</div></div>
+      <div class="et-stat"><div class="et-stat-label">Comissão Total</div><div class="et-stat-val" style="color:var(--gold)">R$ ${totalCom.toFixed(2)}</div></div>
+      <div class="et-stat"><div class="et-stat-label">Com. Recebida</div><div class="et-stat-val" style="color:var(--green-text)">R$ ${comPaga.toFixed(2)}</div></div>
+      <div class="et-stat"><div class="et-stat-label">Com. Pendente</div><div class="et-stat-val" style="color:#DC2626">R$ ${comPend.toFixed(2)}</div></div>
+      <div class="et-stat"><div class="et-stat-label">Cancelados</div><div class="et-stat-val" style="color:var(--text2)">${freshFiltered.filter(r=>getStatus(r)==='cancelado').length} saque${freshFiltered.filter(r=>getStatus(r)==='cancelado').length!==1?'s':''}</div></div>
+    </div>
+
+    ${freshFiltered.length===0
+      ?`<div style="text-align:center;padding:60px;color:var(--text2)">Nenhum saque registrado.</div>`
+      :`<div style="background:var(--white);border:1px solid var(--border);border-radius:var(--radius2);overflow:hidden">
+        <table style="width:100%;font-size:13px;border-collapse:collapse">
+          <thead><tr style="background:var(--bg)">
+            ${isAdminPlus?'<th style="padding:10px 14px;text-align:left;font-weight:700;color:var(--text2)">Cliente</th>':''}
+            <th style="padding:10px 14px;text-align:left;font-weight:700;color:var(--text2)">Data</th>
+            <th style="padding:10px 14px;text-align:right;font-weight:700;color:var(--text2)">Saque</th>
+            <th style="padding:10px 14px;text-align:right;font-weight:700;color:var(--text2)">Comissão</th>
+            <th style="padding:10px 14px;text-align:right;font-weight:700;color:var(--text2)">Líquido</th>
+            <th style="padding:10px 14px;text-align:center;font-weight:700;color:var(--text2)">Status Comissão</th>
+            ${isAdminPlus?'<th style="padding:10px 14px;text-align:center;font-weight:700;color:var(--text2)">Ações</th>':''}
+          </tr></thead>
+          <tbody>
+            ${freshFiltered.map(r=>{
+              const st=getStatus(r);
+              const cfg=statusCfg[st]||statusCfg.pendente;
+              return `<tr style="border-top:1px solid var(--border)">
+                ${isAdminPlus?`<td style="padding:10px 14px"><div style="font-weight:600">${r.nome}</div><div style="font-size:11px;color:var(--text2)">${r.email}</div></td>`:''}
+                <td style="padding:10px 14px">${r.data}</td>
+                <td style="padding:10px 14px;text-align:right;font-weight:700">R$ ${r.valor.toFixed(2)}</td>
+                <td style="padding:10px 14px;text-align:right;color:var(--gold);font-weight:700">R$ ${r.comissao.toFixed(2)}</td>
+                <td style="padding:10px 14px;text-align:right;color:var(--green-text);font-weight:700">R$ ${r.liquido.toFixed(2)}</td>
+                <td style="padding:10px 14px;text-align:center">
+                  ${isAdminPlus
+                    ?`<select onchange="setComissaoStatus('${r.email}','${r.id}',this.value)"
+                        style="background:var(--white);color:${cfg.color};border:none;border-radius:20px;padding:5px 14px;font-size:12px;font-weight:700;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;text-align:center;min-width:110px">
+                        <option value="pago"      ${st==='pago'?'selected':''}>✅ Pago</option>
+                        <option value="pendente"  ${st==='pendente'?'selected':''}>🕐 Pendente</option>
+                        <option value="cancelado" ${st==='cancelado'?'selected':''}>✕ Cancelado</option>
+                      </select>`
+                    :`<span style="background:${cfg.bg};color:${cfg.color};font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px">${cfg.label}</span>`}
+                </td>
+                ${isAdminPlus?`<td style="padding:10px 14px;text-align:center">
+                  <div style="display:flex;gap:5px;justify-content:center">
+                    <button onclick="editarSaqueGG('${r.email}','${r.id}')" style="background:var(--white);color:var(--teal);border:1.5px solid var(--teal);border-radius:6px;padding:4px 9px;cursor:pointer;font-size:12px">✏️</button>
+                    <button onclick="removerSaqueGGFromHist('${r.email}','${r.id}')" style="background:var(--white);color:#DC2626;border:1.5px solid #FECACA;border-radius:6px;padding:4px 9px;cursor:pointer;font-size:12px">🗑️</button>
+                  </div>
+                </td>`:''}
+              </tr>`;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>`}
+  `;
+}
+
+function removerSaqueGGFromHist(email, saqueId){
+  confirmAction('Remover este saque?', ()=>{
+    const all=getGGData(); const u=all[email]; if(!u)return;
+    u.saques=(u.saques||[]).filter(s=>s.id!==saqueId);
+    u.comissaoPaga=parseFloat((u.saques||[]).filter(s=>s.comissaoPaga).reduce((sum,s)=>sum+s.comissao,0).toFixed(2));
+    u.comissaoPendente=parseFloat((u.saques||[]).filter(s=>!s.comissaoPaga).reduce((sum,s)=>sum+s.comissao,0).toFixed(2));
+    recalcularBancaGG(u);
+    saveGGData(all);
+    renderHistSaques();
+    refreshGGCards();
+    showToast('Saque removido ✅');
+  },'Remover');
 }
 
 function renderAdmin(){
@@ -5088,7 +5836,20 @@ function selectAdminUser(email){
     <div class="detail-field"><span class="detail-label">Email</span><span class="detail-val">${u.email}</span></div>
     <div class="detail-field"><span class="detail-label">Telefone</span><span class="detail-val">${u.tel||'—'}</span></div>
     <div class="detail-field"><span class="detail-label">Tipo de conta</span><span class="badge ${u.role==='Master'?'badge-gold':u.role==='Admin'?'badge-blue':'badge-teal'}">${u.role}</span></div>
-    <div class="detail-field"><span class="detail-label">Plano</span><span class="detail-val" style="background:${u.plano==='pro'?'var(--teal-light)':'var(--gold-bg)'};color:${u.plano==='pro'?'var(--teal)':'#92400E'};padding:2px 10px;border-radius:20px;font-size:11.5px;font-weight:700">${u.plano==='pro'?'⭐ Pro':'🆓 Trial'}</span></div>
+    ${(()=>{
+      const pg=getUserPaymentStatus(u.email);
+      const isPromoUser=pg.forma==='Código Promocional';
+      const planoLabel=pg.plano==='Pro Mensal'&&pg.status==='Ativo'?'⭐ Pro Mensal':'🆓 Trial';
+      const planoBg=pg.plano==='Pro Mensal'&&pg.status==='Ativo'?'var(--teal-light)':'var(--gold-bg)';
+      const planoClr=pg.plano==='Pro Mensal'&&pg.status==='Ativo'?'var(--teal)':'#92400E';
+      return `<div class="detail-field"><span class="detail-label">Plano</span>
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+          <span style="background:${planoBg};color:${planoClr};padding:2px 10px;border-radius:20px;font-size:11.5px;font-weight:700">${planoLabel}</span>
+          ${isPromoUser?`<span style="background:#EDE9FE;color:#7C3AED;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px">🎟️ Código Promo</span>`:''}
+        </div>
+      </div>
+      ${isPromoUser?`<div class="detail-field"><span class="detail-label">Código usado</span><span class="detail-val" style="color:#7C3AED;font-weight:700">${pg.obs||'—'}</span></div>`:''}`;
+    })()}
     <div class="detail-field"><span class="detail-label">Cadastro</span><span class="detail-val">${u.data||'—'}</span></div>
     <div class="detail-actions">
       <button class="btn btn-primary" style="justify-content:center" onclick="gerenciarComo('${u.email}')">⚙️ Gerenciar</button>
@@ -5915,6 +6676,184 @@ function showToast(msg){
         <div class="mf">
           <button class="btn btn-outline" style="flex:1;justify-content:center" onclick="closeM('m-gg-edit-hist')">Cancelar</button>
           <button class="btn btn-primary" style="flex:1;justify-content:center" onclick="salvarEdicaoHistGG()">Salvar</button>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- MODAL: Atualizar Banca GG -->
+    <div class="mo" id="m-gg-upd-banca">
+      <div class="modal" style="max-width:440px">
+        <div class="mh">
+          <div class="mt2">📊 Atualizar Banca</div>
+          <button class="mc" onclick="closeM('m-gg-upd-banca')">✕</button>
+        </div>
+        <input type="hidden" id="gg-upd-email">
+        <div id="gg-upd-err" style="display:none;color:#DC2626;font-size:13px;margin-bottom:12px;background:#FEF2F2;padding:8px 12px;border-radius:8px"></div>
+        <div style="background:var(--bg);border-radius:10px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between">
+          <span style="font-size:12px;font-weight:700;color:var(--text2)">BANCA ATUAL</span>
+          <span id="gg-upd-banca-atual" style="font-size:15px;font-weight:800;color:var(--teal)">—</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div>
+              <label style="font-size:12px;font-weight:700;color:var(--text2);display:block;margin-bottom:5px">DATA *</label>
+              <input class="fi" type="date" id="gg-upd-data" style="margin:0">
+            </div>
+            <div>
+              <label style="font-size:12px;font-weight:700;color:var(--text2);display:block;margin-bottom:5px">NOVO VALOR DA BANCA (R$) *</label>
+              <input class="fi" type="number" step="0.01" id="gg-upd-valor" placeholder="Ex: 250.00" style="margin:0">
+            </div>
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:700;color:var(--text2);display:block;margin-bottom:5px">OBSERVAÇÃO</label>
+            <input class="fi" type="text" id="gg-upd-obs" placeholder="Ex: Resultado da semana, ajuste..." style="margin:0">
+          </div>
+          <div id="gg-upd-info" style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:10px;padding:12px;font-size:12px;color:var(--green-text)">
+            💡 Você pode informar qualquer data a partir do início da gestão — o registro aparecerá no mês correspondente do histórico.
+          </div>
+        </div>
+        <div class="mf">
+          <button class="btn btn-outline" style="flex:1;justify-content:center" onclick="closeM('m-gg-upd-banca')">Cancelar</button>
+          <button class="btn btn-primary" style="flex:1;justify-content:center" onclick="salvarAtualizacaoBancaGG()">Salvar</button>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- MODAL: Novo/Editar Contrato -->
+    <div class="mo" id="m-contrato-form">
+      <div class="modal" style="max-width:560px">
+        <div class="mh">
+          <div class="mt2" id="m-contrato-form-title">📄 Novo Contrato</div>
+          <button class="mc" onclick="closeM('m-contrato-form')">✕</button>
+        </div>
+        <input type="hidden" id="cf-id">
+        <div id="cf-err" style="display:none;color:#DC2626;font-size:13px;margin-bottom:12px;background:#FEF2F2;padding:8px 12px;border-radius:8px"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div style="grid-column:1/-1">
+            <label style="font-size:12px;font-weight:700;color:var(--text2);display:block;margin-bottom:5px">USUÁRIO *</label>
+            <select class="fi" id="cf-usuario" style="margin:0"></select>
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:700;color:var(--text2);display:block;margin-bottom:5px">DATA INICIAL *</label>
+            <input class="fi" type="date" id="cf-data-inicio" style="margin:0">
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:700;color:var(--text2);display:block;margin-bottom:5px">DATA FINAL</label>
+            <input class="fi" type="date" id="cf-data-fim" style="margin:0">
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:700;color:var(--text2);display:block;margin-bottom:5px">BANCA INICIAL (R$) *</label>
+            <input class="fi" type="number" step="0.01" id="cf-banca-ini" placeholder="Ex: 500.00" style="margin:0" oninput="calcContratoPreview()">
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:700;color:var(--text2);display:block;margin-bottom:5px">BANCA FINAL (R$)</label>
+            <input class="fi" type="number" step="0.01" id="cf-banca-fin" placeholder="Ex: 650.00" style="margin:0" oninput="calcContratoPreview()">
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:700;color:var(--text2);display:block;margin-bottom:5px">COMISSÃO (%) *</label>
+            <input class="fi" type="number" step="0.1" id="cf-comissao-pct" placeholder="10" style="margin:0" oninput="calcContratoPreview()">
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:700;color:var(--text2);display:block;margin-bottom:5px">STATUS *</label>
+            <select class="fi" id="cf-status" style="margin:0">
+              <option value="Ativo">Ativo</option>
+              <option value="Aguardando saque">Aguardando saque</option>
+              <option value="Finalizado">Finalizado</option>
+              <option value="Encerrado">Encerrado</option>
+              <option value="Cancelado">Cancelado</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:700;color:var(--text2);display:block;margin-bottom:5px">MOTIVO DO FIM</label>
+            <select class="fi" id="cf-motivo" style="margin:0">
+              <option value="">— Nenhum —</option>
+              <option value="Fim do prazo">Fim do prazo</option>
+              <option value="Cliente encerrou">Cliente encerrou</option>
+              <option value="Stop loss">Stop loss</option>
+              <option value="Meta atingida">Meta atingida</option>
+              <option value="Saque total">Saque total</option>
+              <option value="Cancelado">Cancelado</option>
+              <option value="Outro">Outro</option>
+            </select>
+          </div>
+          <div style="grid-column:1/-1">
+            <label style="font-size:12px;font-weight:700;color:var(--text2);display:block;margin-bottom:5px">OBSERVAÇÕES</label>
+            <textarea class="fi" id="cf-obs" rows="2" placeholder="Anotações sobre o contrato..." style="margin:0;resize:vertical"></textarea>
+          </div>
+        </div>
+        <!-- Preview calcs -->
+        <div id="cf-preview" style="display:none;margin-top:14px;background:var(--bg);border-radius:12px;padding:14px">
+          <div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:10px;letter-spacing:.5px">PRÉVIA DOS CÁLCULOS</div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+            <div style="text-align:center">
+              <div style="font-size:10px;color:var(--text2);font-weight:600;margin-bottom:2px">LUCRO</div>
+              <div id="cf-prev-lucro" style="font-size:14px;font-weight:800">—</div>
+            </div>
+            <div style="text-align:center">
+              <div style="font-size:10px;color:var(--text2);font-weight:600;margin-bottom:2px">VL. COMISSÃO</div>
+              <div id="cf-prev-com" style="font-size:14px;font-weight:800;color:var(--gold)">—</div>
+            </div>
+            <div style="text-align:center">
+              <div style="font-size:10px;color:var(--text2);font-weight:600;margin-bottom:2px">VL. CLIENTE</div>
+              <div id="cf-prev-cli" style="font-size:14px;font-weight:800;color:var(--teal)">—</div>
+            </div>
+            <div style="text-align:center">
+              <div style="font-size:10px;color:var(--text2);font-weight:600;margin-bottom:2px">DURAÇÃO</div>
+              <div id="cf-prev-dias" style="font-size:14px;font-weight:800">—</div>
+            </div>
+          </div>
+        </div>
+        <div class="mf">
+          <button class="btn btn-outline" style="flex:1;justify-content:center" onclick="closeM('m-contrato-form')">Cancelar</button>
+          <button class="btn btn-primary" style="flex:1;justify-content:center" onclick="salvarContrato()">Salvar Contrato</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL: Encerrar Contrato -->
+    <div class="mo" id="m-contrato-encerrar">
+      <div class="modal" style="max-width:400px">
+        <div class="mh">
+          <div class="mt2">⛔ Encerrar Contrato</div>
+          <button class="mc" onclick="closeM('m-contrato-encerrar')">✕</button>
+        </div>
+        <input type="hidden" id="ce-id">
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div>
+            <label style="font-size:12px;font-weight:700;color:var(--text2);display:block;margin-bottom:5px">BANCA FINAL (R$) *</label>
+            <input class="fi" type="number" step="0.01" id="ce-banca-fin" placeholder="Valor atual da banca" style="margin:0">
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:700;color:var(--text2);display:block;margin-bottom:5px">MOTIVO *</label>
+            <select class="fi" id="ce-motivo" style="margin:0">
+              <option value="Fim do prazo">Fim do prazo</option>
+              <option value="Cliente encerrou">Cliente encerrou</option>
+              <option value="Stop loss">Stop loss</option>
+              <option value="Meta atingida">Meta atingida</option>
+              <option value="Saque total">Saque total</option>
+              <option value="Cancelado">Cancelado</option>
+              <option value="Outro">Outro</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:700;color:var(--text2);display:block;margin-bottom:5px">STATUS FINAL</label>
+            <select class="fi" id="ce-status" style="margin:0">
+              <option value="Encerrado">Encerrado</option>
+              <option value="Finalizado">Finalizado</option>
+              <option value="Cancelado">Cancelado</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:700;color:var(--text2);display:block;margin-bottom:5px">OBSERVAÇÕES</label>
+            <textarea class="fi" id="ce-obs" rows="2" style="margin:0;resize:vertical" placeholder="Motivo detalhado..."></textarea>
+          </div>
+          <div id="ce-err" style="display:none;color:#DC2626;font-size:13px;background:#FEF2F2;padding:8px 12px;border-radius:8px"></div>
+        </div>
+        <div class="mf">
+          <button class="btn btn-outline" style="flex:1;justify-content:center" onclick="closeM('m-contrato-encerrar')">Cancelar</button>
+          <button class="btn btn-primary" style="flex:1;justify-content:center;background:#DC2626;border-color:#DC2626" onclick="confirmarEncerrarContrato()">Encerrar</button>
         </div>
       </div>
     </div>
